@@ -1,11 +1,9 @@
 #include "ApiCall.h"
 
-ApiCall::ApiCall(std::string uri): m_client(), m_request(uri) {};
+ApiCall::ApiCall(std::string uri): m_client(), m_request(uri) {
+    m_request << header("Connection", "close");
+};
 
 std::string ApiCall::request(){
-    http::client client;
-    http::client::request request(m_request);
-    request << header("Connection", "close");
-    http::client::response response = client.get(request);
-    return body(response);
+    return body(m_client.get(m_request));
 }
