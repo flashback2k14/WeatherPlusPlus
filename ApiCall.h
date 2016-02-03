@@ -1,27 +1,53 @@
 #ifndef APICALL_H
 #define APICALL_H
 
-#include <boost/network/protocol/http/client.hpp>
-using namespace boost::network;
+#include <QObject>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QEventLoop>
+#include <QDebug>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QByteArray>
 
-class ApiCall {
+
+class ApiCall : public QObject {
+
+Q_OBJECT
 
 private:
-    http::client m_client;
-    http::client::request m_request;
+    QString mUri;
 
 public:
     /**
-     * Constructor
+     * Constructor / Destructor
      */
-    ApiCall(std::string uri) : m_client(), m_request(uri) {
-         m_request << header("Connection", "close");
-    };
+    ApiCall(QString uri) : mUri(uri) {};
+    ~ApiCall(){};
+
     /**
-     * Request Data
+     * Send Request
      */
-    std::string request() {
-        return body(m_client.get(m_request));
+    QByteArray sendRequest() {
+        // create custom temporary event loop on stack
+        QEventLoop eventLoop;
+        // create network access manager
+        QNetworkAccessManager *mAccessManager = new QNetworkAccessManager(this);
+        // "quit()" the event-loop, when the network request "finished()"
+        connect(mAccessManager, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+        // send HTTP Request and catch Response
+        QNetworkReply *reply =  mAccessManager->get(QNetworkRequest(QUrl(mUri)));
+        // blocks stack until "finished()" has been called
+        eventLoop.exec();
+        // check Response
+        if (reply->error() == QNetworkReply::NoError) {
+            // success
+            return reply->readAll();
+        } else {
+            // error
+            return reply->errorString().toUtf8();
+        }
     };
 
 };

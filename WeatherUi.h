@@ -5,23 +5,25 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QTextEdit>
+#include <QLineEdit>
 #include <QPushButton>
+#include <QNetworkRequest>
+#include <QByteArray>
+
+#include "ApiUri.h"
+#include "ApiCall.h"
 
 #include <iostream>
-#include "WeatherUi.h"
-#include "ApiCall.h"
-#include "ApiUri.h"
-
 using namespace std;
 
-class WeatherUi: public QMainWindow {
+
+class WeatherUi : public QMainWindow {
 
 Q_OBJECT
 
 private:
     QWidget* mWindow;
-    QTextEdit* mTxtSearchQuery;
+    QLineEdit* mTxtSearchQuery;
 
 public:
     /**
@@ -47,12 +49,13 @@ public:
         label->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
         label->setText("Choose your City:");
         // Textfield
-        mTxtSearchQuery = new QTextEdit;
-        mTxtSearchQuery->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+        mTxtSearchQuery = new QLineEdit;
+        mTxtSearchQuery->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
         mTxtSearchQuery->setFixedHeight(25);
         // Button
         QPushButton *btnSearch = new QPushButton;
         btnSearch->setText("SEARCH");
+        btnSearch->setDefault(true);
         // Click Listener
         connect(btnSearch, SIGNAL(clicked()), this, SLOT(requestWeatherData()));
         // add Widgets to Header Layout
@@ -94,10 +97,16 @@ public slots:
      * Request Weather Data
      */
     void requestWeatherData() {
-        std::string uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->toPlainText().toStdString());
+        // create api uri to call
+        QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->text());
+        // create api caller object
         ApiCall currentWeatherByCity(uri);
-        std::string resp = currentWeatherByCity.request();
-        cout << resp << endl;
+        // get data response
+        QByteArray ba = currentWeatherByCity.sendRequest();
+        // print response
+        cout << "Call: " << ba.data() << endl;
+        // clear input
+        mTxtSearchQuery->setText("");
     };
 };
 
