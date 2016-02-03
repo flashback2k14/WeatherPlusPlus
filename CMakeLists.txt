@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.3)
 project(WeatherPlusPlus)
+# qt5 meta objects
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # source code
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(SOURCE_FILES main.cpp ApiCall.h ApiCall.cpp WeatherUi.cpp WeatherUi.h)
+set(SOURCE_FILES main.cpp ApiCall.h WeatherUi.h ApiUri.h)
 add_executable(WeatherPlusPlus ${SOURCE_FILES})
 # cppnet - both
 find_package(cppnetlib 0.11.0 REQUIRED)
