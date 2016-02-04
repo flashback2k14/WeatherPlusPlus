@@ -9,6 +9,8 @@
 #include <QPushButton>
 
 #include <iostream>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include "WeatherUi.h"
 #include "ApiCall.h"
 #include "ApiUri.h"
@@ -97,7 +99,15 @@ public slots:
         std::string uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->toPlainText().toStdString());
         ApiCall currentWeatherByCity(uri);
         std::string resp = currentWeatherByCity.request();
-        cout << resp << endl;
+
+        QByteArray ba(resp.data());
+        QJsonDocument sourceJsonDoc;
+
+        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
+        QJsonObject jsonObject = destJsonDoc.object();
+
+        QString name = jsonObject["name"].toString();
+        cout << "TEST: " << name.toStdString() << endl;
     };
 };
 
