@@ -5,13 +5,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # source code
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(SOURCE_FILES main.cpp WeatherUi.h ApiUri.h ApiCall.h)
 set(SOURCE_FILES main.cpp ApiCall.h WeatherUi.h ApiUri.h WeatherParser.h WeatherData.h)
 add_executable(WeatherPlusPlus ${SOURCE_FILES})
-# cppnet - both
-find_package(cppnetlib 0.11.0 REQUIRED)
-include_directories(${CPPNETLIB_INCLUDE_DIRS})
-target_link_libraries(WeatherPlusPlus ${CPPNETLIB_LIBRARIES})
-# qt5 - flashback2k14
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
-target_link_libraries(WeatherPlusPlus Qt5::Core Qt5::Widgets Qt5::Gui)
-# qt5 - hetec
+# qt5
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network)
+target_link_libraries(WeatherPlusPlus Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network)
