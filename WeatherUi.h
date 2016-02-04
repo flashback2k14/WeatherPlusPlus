@@ -15,6 +15,7 @@
 #include "WeatherUi.h"
 #include "ApiCall.h"
 #include "ApiUri.h"
+#include "WeatherParser.h"
 
 using namespace std;
 
@@ -101,23 +102,31 @@ public slots:
         ApiCall currentWeatherByCity(uri);
         std::string resp = currentWeatherByCity.request();
 
-        QByteArray ba(resp.data());
-        QJsonDocument sourceJsonDoc;
+        WeatherParser parser(resp);
+        std::string name = parser.getValueForKey(QString("name")).toString().toStdString();
+        cout << "Name: " << name << endl;
 
-        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
-        QJsonObject jsonObject = destJsonDoc.object();
+        QJsonObject main = parser.getObjectForKey(QString("main"));
+        std::string temp = parser.getTemp(main);
 
-        QJsonValue main = jsonObject.value(QString("main"));
-        QJsonObject mainObj = main.toObject();
 
-        qWarning() << tr("QJsonObject of description: ") << mainObj;
-
-        QJsonValue tempValue = mainObj.value(QString("temp"));
-        double temp = tempValue.toDouble() - 273.15;
-        cout << "TEST: " << temp << endl;
-
-        QString name = jsonObject["name"].toString();
-        cout << "TEST: " << name.toStdString() << endl;
+//        QByteArray ba(resp.data());
+//        QJsonDocument sourceJsonDoc;
+//
+//        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
+//        QJsonObject jsonObject = destJsonDoc.object();
+//
+//        QJsonValue main = jsonObject.value(QString("main"));
+//        QJsonObject mainObj = main.toObject();
+//
+//        qWarning() << tr("QJsonObject of description: ") << mainObj;
+//
+//        QJsonValue tempValue = mainObj.value(QString("temp"));
+//        double temp = tempValue.toDouble() - 273.15;
+//        cout << "TEST: " << temp << endl;
+//
+//        QString name = jsonObject["name"].toString();
+//        cout << "TEST: " << name.toStdString() << endl;
 
     };
 };

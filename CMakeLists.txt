@@ -5,7 +5,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # source code
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(SOURCE_FILES main.cpp ApiCall.h WeatherUi.h ApiUri.h)
+set(SOURCE_FILES main.cpp ApiCall.h WeatherUi.h ApiUri.h WeatherParser.h)
 add_executable(WeatherPlusPlus ${SOURCE_FILES})
 # cppnet - both
 find_package(cppnetlib 0.11.0 REQUIRED)
