@@ -108,10 +108,13 @@ public slots:
         QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->text());
         // create api caller object
         ApiCall currentWeatherByCity(uri);
-        std::string resp = currentWeatherByCity.request();
 
-        WeatherParser parser(resp);
+        // get data response
+        QByteArray ba = currentWeatherByCity.sendRequest();
+        // print response
+        cout << "Call: " << ba.data() << endl;
 
+        WeatherParser parser(ba);
         //get all descriptions
         std::vector<WeatherDescription> descriptions = parser.getWeatherDescription();
         WeatherDescription description = descriptions[0];
@@ -126,10 +129,6 @@ public slots:
         cout << "Humidity: " << weatherInfo.humidity << endl;
         cout << "Pressure: " << weatherInfo.pressure << endl;
 
-        // get data response
-        QByteArray ba = currentWeatherByCity.sendRequest();
-        // print response
-        cout << "Call: " << ba.data() << endl;
         // clear input
         mTxtSearchQuery->setText("");
     };

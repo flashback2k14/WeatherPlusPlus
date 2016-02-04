@@ -32,10 +32,9 @@ private:
     }
 
 public:
-    WeatherParser(std::string json) {
-        QByteArray ba(json.data());
+    WeatherParser(QByteArray jsonData) {
         QJsonDocument sourceJsonDoc;
-        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
+        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(jsonData);
         jsonRoot = destJsonDoc.object();
     }
 
