@@ -94,8 +94,6 @@ public slots:
      * Request Weather Data
      */
     void requestWeatherData() {
-        cout << "Search Query: " << mTxtSearchQuery->toPlainText().toStdString() << endl;
-
         std::string uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->toPlainText().toStdString());
         ApiCall currentWeatherByCity(uri);
         std::string resp = currentWeatherByCity.request();
