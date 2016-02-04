@@ -16,6 +16,8 @@
 #include "ApiCall.h"
 #include "ApiUri.h"
 #include "WeatherParser.h"
+#include "WeatherData.h"
+
 
 using namespace std;
 
@@ -103,31 +105,20 @@ public slots:
         std::string resp = currentWeatherByCity.request();
 
         WeatherParser parser(resp);
-        std::string name = parser.getValueForKey(QString("name")).toString().toStdString();
-        cout << "Name: " << name << endl;
 
-        QJsonObject main = parser.getObjectForKey(QString("main"));
-        std::string temp = parser.getTemp(main);
+        //get all descriptions
+        std::vector<WeatherDescription> descriptions = parser.getWeatherDescription();
+        WeatherDescription description = descriptions[0];
+        cout << "Short desc: " << description.main << endl;
+        cout << "Long desc: " << description.description << endl;
 
-
-//        QByteArray ba(resp.data());
-//        QJsonDocument sourceJsonDoc;
-//
-//        QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
-//        QJsonObject jsonObject = destJsonDoc.object();
-//
-//        QJsonValue main = jsonObject.value(QString("main"));
-//        QJsonObject mainObj = main.toObject();
-//
-//        qWarning() << tr("QJsonObject of description: ") << mainObj;
-//
-//        QJsonValue tempValue = mainObj.value(QString("temp"));
-//        double temp = tempValue.toDouble() - 273.15;
-//        cout << "TEST: " << temp << endl;
-//
-//        QString name = jsonObject["name"].toString();
-//        cout << "TEST: " << name.toStdString() << endl;
-
+        //get detailed information
+        WeatherInfo weatherInfo = parser.getWeatheInfo();
+        cout << "Temp: " << weatherInfo.temp << endl;
+        cout << "Max temp: " << weatherInfo.temp_max << endl;
+        cout << "Min temp: " << weatherInfo.temp_min << endl;
+        cout << "Humidity: " << weatherInfo.humidity << endl;
+        cout << "Pressure: " << weatherInfo.pressure << endl;
     };
 };
 
