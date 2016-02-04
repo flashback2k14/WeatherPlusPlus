@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.3)
 project(WeatherPlusPlus)
-
+# qt5 meta objects
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# source code
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(SOURCE_FILES main.cpp ApiCall.h ApiCall.cpp)
+set(SOURCE_FILES main.cpp WeatherUi.h ApiUri.h ApiCall.h)
 add_executable(WeatherPlusPlus ${SOURCE_FILES})
-
-find_package(cppnetlib 0.11.0 REQUIRED)
-include_directories(${CPPNETLIB_INCLUDE_DIRS})
-target_link_libraries(WeatherPlusPlus ${CPPNETLIB_LIBRARIES})
-
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
-target_link_libraries(WeatherPlusPlus Qt5::Core Qt5::Widgets Qt5::Gui)
+# qt5
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network)
+target_link_libraries(WeatherPlusPlus Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network)
