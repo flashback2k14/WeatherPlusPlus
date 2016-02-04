@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QDebug>
 
 #include <iostream>
 #include <qjsondocument.h>
@@ -106,8 +107,18 @@ public slots:
         QJsonDocument destJsonDoc = sourceJsonDoc.fromJson(ba);
         QJsonObject jsonObject = destJsonDoc.object();
 
+        QJsonValue main = jsonObject.value(QString("main"));
+        QJsonObject mainObj = main.toObject();
+
+        qWarning() << tr("QJsonObject of description: ") << mainObj;
+
+        QJsonValue tempValue = mainObj.value(QString("temp"));
+        double temp = tempValue.toDouble() - 273.15;
+        cout << "TEST: " << temp << endl;
+
         QString name = jsonObject["name"].toString();
         cout << "TEST: " << name.toStdString() << endl;
+
     };
 };
 
