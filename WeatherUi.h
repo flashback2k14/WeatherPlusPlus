@@ -254,14 +254,21 @@ public slots:
         //get all descriptions
         std::vector<WeatherDescription> weatherDescriptions = parser.getWeatherDescription();
         WeatherDescription weatherDescription = weatherDescriptions[0];
-        cout << "Icon: " << weatherDescription.icon << endl;
-
         //get detailed information
         WeatherInfo weatherInfo = parser.getWeatheInfo();
 
         // Get Weather Icon
         WeatherMapper *mapper = new WeatherMapper();
-        std::string weatherIcon = mapper->getWeatherIcon(weatherDescription.description);
+        std::string weatherIcon;
+        weatherIcon = mapper->getWeatherIconByDesc(weatherDescription.description);
+        // fallback solution, if icon is not found with description
+        if (weatherIcon.empty()) {
+            weatherIcon = mapper->getWeatherIconByIcon(weatherDescription.icon);
+        }
+        // if fallback fails, show unknown icon
+        if (weatherIcon.empty()) {
+            weatherIcon = "unknown";
+        }
         // Set Weather Icon
         loadNewImage(QString::fromStdString(weatherIcon));
         // Set Weather Description
