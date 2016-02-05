@@ -29,6 +29,7 @@ class WeatherUi : public QMainWindow {
 Q_OBJECT
 
 private:
+    QString mAppPath;
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
     QLabel *mInfoLabel;
@@ -37,7 +38,7 @@ public:
     /**
      * Constructor / Destructor
      */
-    WeatherUi() {};
+    WeatherUi(QString path): mAppPath(path) {};
     ~WeatherUi() {};
     /**
      * Build and Show
@@ -86,6 +87,13 @@ public:
         QHBoxLayout *hBodyLayout = new QHBoxLayout(bodyWidget);
         hBodyLayout->setAlignment(Qt::AlignCenter);
 
+        // weather icon
+        QLabel *icon = new QLabel();//new QLabel("<img src='/Users/patrick/Documents/projects/WeatherPlusPlus/icons/clouds.png' />");
+        cout << "PATH: " << mAppPath.toStdString() << endl;
+        icon->setPixmap(QPixmap("icons/moon.png"));
+        icon->setAlignment(Qt::AlignTop);
+        hBodyLayout->addWidget(icon);
+
         // configure body widget
         bodyWidget->setStyleSheet("background-color:green");
 
@@ -101,7 +109,7 @@ public:
         // Label
         mInfoLabel = new QLabel();
         mInfoLabel->setAlignment(Qt::AlignTop);
-        mInfoLabel->setText("TEST");
+        mInfoLabel->setText("Please enter your location (city name)");
         hFooterLayout->addWidget(mInfoLabel);
 
         // configure footer widget

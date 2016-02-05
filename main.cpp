@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // Create WeatherUi Window
-    WeatherUi wui;
+    WeatherUi wui(app.applicationDirPath());
 
     // Setup Window
     wui.setupUi();
