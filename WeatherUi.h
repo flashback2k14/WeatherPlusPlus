@@ -31,6 +31,7 @@ Q_OBJECT
 private:
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
+    QLabel *infoLabel;
 
 public:
     /**
@@ -76,6 +77,13 @@ public:
         QHBoxLayout *hBodyLayout = new QHBoxLayout;
         hBodyLayout->setAlignment(Qt::AlignCenter);
 
+        // Label
+        infoLabel = new QLabel();
+        infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+        infoLabel->setText("TEST");
+        hBodyLayout->addWidget(infoLabel);
+
+
         /**
          * Footer Layout
          */
@@ -111,8 +119,6 @@ public slots:
 
         // get data response
         QByteArray ba = currentWeatherByCity.sendRequest();
-        // print response
-        cout << "Call: " << ba.data() << endl;
 
         WeatherParser parser(ba);
         //get all descriptions
@@ -123,14 +129,16 @@ public slots:
 
         //get detailed information
         WeatherInfo weatherInfo = parser.getWeatheInfo();
-        cout << "Temp: " << weatherInfo.temp << endl;
+        std::string tempAsString = std::to_string(weatherInfo.temp);
+        cout << "Temp: " << tempAsString << endl;
         cout << "Max temp: " << weatherInfo.temp_max << endl;
         cout << "Min temp: " << weatherInfo.temp_min << endl;
         cout << "Humidity: " << weatherInfo.humidity << endl;
         cout << "Pressure: " << weatherInfo.pressure << endl;
 
-        // clear input
-        mTxtSearchQuery->setText("");
+        // set focus and select current text
+        mTxtSearchQuery->setFocus();
+        mTxtSearchQuery->selectAll();
     };
 };
 
