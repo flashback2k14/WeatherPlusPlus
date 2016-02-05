@@ -30,6 +30,7 @@ Q_OBJECT
 
 private:
     QString mAppPath;
+    QImage *mImage;
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
     QLabel *mInfoLabel;
@@ -88,11 +89,20 @@ public:
         hBodyLayout->setAlignment(Qt::AlignCenter);
 
         // weather icon
-        QLabel *icon = new QLabel();//new QLabel("<img src='/Users/patrick/Documents/projects/WeatherPlusPlus/icons/clouds.png' />");
-        cout << "PATH: " << mAppPath.toStdString() << endl;
-        icon->setPixmap(QPixmap("icons/moon.png"));
-        icon->setAlignment(Qt::AlignTop);
-        hBodyLayout->addWidget(icon);
+        // create label to hold image
+        QLabel *imageLabel = new QLabel();
+        // init global private image
+        mImage = new QImage();
+        // load the placeholder image
+        mImage->load("icons/unknown.png");
+        // replace the current image with the scaled one
+        *mImage = mImage->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        // add image to label
+        imageLabel->setPixmap(QPixmap::fromImage(*mImage));
+        imageLabel->setAlignment(Qt::AlignCenter);
+        // add icon to widget
+        hBodyLayout->addWidget(imageLabel);
+
 
         // configure body widget
         bodyWidget->setStyleSheet("background-color:green");
