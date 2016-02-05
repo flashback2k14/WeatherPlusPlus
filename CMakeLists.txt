@@ -11,4 +11,3 @@ add_executable(WeatherPlusPlus ${SOURCE_FILES})
 # qt5
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network)
 target_link_libraries(WeatherPlusPlus Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Network)
-

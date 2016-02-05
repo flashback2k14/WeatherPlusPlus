@@ -1,32 +1,34 @@
 #ifndef WEATHERPARSER_H
 #define WEATHERPARSER_H
 
-#include <qbytearray.h>
-#include <qjsondocument.h>
-#include <qjsonobject.h>
-#include <qjsonarray.h>
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <QDebug>
-#include <iostream>
 
 #include "WeatherData.h"
 
+#include <iostream>
 using namespace std;
+
 
 const static double gCALVIN = 273.15;
 
 class WeatherParser {
+
 private:
     QJsonObject jsonRoot;
 
-    QJsonValue getGenericValueForKey (QString keyName, QJsonObject jsonObject){
+    QJsonValue getGenericValueForKey (QString keyName, QJsonObject jsonObject) {
         return jsonObject.value(keyName);
     }
 
-    std::string valueToStdString (QJsonValue value){
+    std::string valueToStdString (QJsonValue value) {
         return value.toString().toStdString();
     }
 
-    double calvinToCelsius(double value){
+    double calvinToCelsius(double value) {
         return value - gCALVIN;
     }
 
@@ -37,27 +39,21 @@ public:
         jsonRoot = destJsonDoc.object();
     }
 
-    QJsonValue getValueForKey(QString keyName) {
-        return getGenericValueForKey(keyName, jsonRoot);
-        //return jsonRoot.value(keyName);
-    }
-
     QJsonObject getObjectForKey(QString keyName) {
         return getGenericValueForKey(keyName, jsonRoot).toObject();
-        //return jsonRoot.value(keyName).toObject();
     }
 
     QJsonArray getArrayForKey(QString keyName) {
         return getGenericValueForKey(keyName, jsonRoot).toArray();
-        //return jsonRoot.value(keyName).toArray();
     }
 
-    std::vector<WeatherDescription> getWeatherDescription(){
+    std::vector<WeatherDescription> getWeatherDescription() {
         std::vector<WeatherDescription> descriptions;
         QJsonArray weatherArray= getArrayForKey(QString("weather"));
         for(QJsonValue const &value : weatherArray){
             WeatherDescription description;
             QJsonObject parentObject = value.toObject();
+            description.icon = valueToStdString(getGenericValueForKey("icon", parentObject));
             description.main = valueToStdString(getGenericValueForKey("main", parentObject));
             description.description = valueToStdString(getGenericValueForKey("description", parentObject));
             descriptions.push_back(description);
@@ -65,7 +61,7 @@ public:
         return descriptions;
     }
 
-    WeatherInfo getWeatheInfo(){
+    WeatherInfo getWeatheInfo() {
         WeatherInfo info;
         QJsonObject parentObject = getObjectForKey(QString("main"));
         info.temp = calvinToCelsius(getGenericValueForKey("temp", parentObject).toDouble());

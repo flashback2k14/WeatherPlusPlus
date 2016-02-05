@@ -6,13 +6,15 @@
 
 
 class WeatherMapper {
+
 private:
     std::map<std::string, std::string> weathers;
+
 public:
-    WeatherMapper(){
+    WeatherMapper() {
         weathers["thunderstorm with light rain"] = "clouds-with-lighting-littlerain";
         weathers["thunderstorm with rain"] = "clouds-with-lighting-rain";
-        weathers["thunderstorm with heavy rainn"] = "clouds-with-lighting-rain";
+        weathers["thunderstorm with heavy rain"] = "clouds-with-lighting-rain";
         weathers["light thunderstorm"] = "clouds-with-lighting";
 
         weathers["thunderstorm"] = "clouds-with-lighting";
@@ -66,11 +68,11 @@ public:
         weathers["sand"] = "sun-haze-01";
 
         weathers["dust"] = "sun-haze-01";
-        weathers["svolcanic ash"] = "sun-haze-01";
+        weathers["volcanic ash"] = "sun-haze-01";
         weathers["squalls"] = "sun-windy-01";
         weathers["tornado"] = "sun-windy-01";
 
-        weathers["clear sky"] = "sun";
+        weathers["sky is clear"] = "sun";
         weathers["few clouds"] = "sun-with-1cloud";
         weathers["scattered clouds"] = "sun-with-3clouds";
         weathers["broken clouds"] = "sun-with-3clouds";
