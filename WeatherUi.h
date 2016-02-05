@@ -34,6 +34,19 @@ private:
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
     QLabel *mInfoLabel;
+    QLabel *imageLabel;
+    /**
+     * Load image for the current weather
+     */
+    void loadNewImage(QString imageName){
+        // create new image
+        QImage *img = new QImage();
+        // load the new image
+        img->load("icons/" + imageName + ".png");
+        // replace the current image with the scaled one
+        *img = img->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        imageLabel->setPixmap(QPixmap::fromImage(*img));
+    }
 
 public:
     /**
@@ -90,7 +103,7 @@ public:
 
         // weather icon
         // create label to hold image
-        QLabel *imageLabel = new QLabel();
+        imageLabel = new QLabel();
         // init global private image
         mImage = new QImage();
         // load the placeholder image
@@ -171,6 +184,8 @@ public slots:
         cout << "Humidity: " << weatherInfo.humidity << endl;
         cout << "Pressure: " << weatherInfo.pressure << endl;
 
+        //mImage->load("icons/clouds.png");
+        loadNewImage("clouds");
         mInfoLabel->setText(QString("%1").arg(weatherInfo.temp));
 
         // set focus and select current text
