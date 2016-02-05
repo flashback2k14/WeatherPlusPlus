@@ -7,7 +7,6 @@
 #include <qjsonarray.h>
 #include <QDebug>
 #include <iostream>
-#include <boost/lexical_cast.hpp>
 
 #include "WeatherData.h"
 
@@ -51,12 +50,6 @@ public:
     QJsonArray getArrayForKey(QString keyName) {
         return getGenericValueForKey(keyName, jsonRoot).toArray();
         //return jsonRoot.value(keyName).toArray();
-    }
-
-    std::string getTemp(QJsonObject parent) {
-        QJsonValue jsonValue = getGenericValueForKey("temp", parent);
-        //QJsonValue jsonValue = parent.value(QString("temp"));
-        return boost::lexical_cast<std::string>(calvinToCelsius(jsonValue.toDouble()));
     }
 
     std::vector<WeatherDescription> getWeatherDescription(){
