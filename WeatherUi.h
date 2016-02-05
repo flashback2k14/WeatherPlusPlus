@@ -31,7 +31,7 @@ Q_OBJECT
 private:
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
-    QLabel *infoLabel;
+    QLabel *minfoLabel;
 
 public:
     /**
@@ -50,7 +50,9 @@ public:
         /**
          * Header Layout
          */
-        QHBoxLayout *hHeaderLayout = new QHBoxLayout;
+        //Header widget
+        QWidget *headerWidget = new QWidget();
+        QHBoxLayout *hHeaderLayout = new QHBoxLayout(headerWidget);
         hHeaderLayout->setAlignment(Qt::AlignTop);
         // Label
         QLabel *label = new QLabel;
@@ -70,6 +72,9 @@ public:
         hHeaderLayout->addWidget(label);
         hHeaderLayout->addWidget(mTxtSearchQuery);
         hHeaderLayout->addWidget(btnSearch);
+        // configure header widget
+        headerWidget->setFixedHeight(50);
+        headerWidget->setStyleSheet("background-color:red");
 
         /**
          * Body Layout
@@ -78,10 +83,10 @@ public:
         hBodyLayout->setAlignment(Qt::AlignCenter);
 
         // Label
-        infoLabel = new QLabel();
-        infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-        infoLabel->setText("TEST");
-        hBodyLayout->addWidget(infoLabel);
+        minfoLabel = new QLabel();
+        minfoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+        minfoLabel->setText("TEST");
+        hBodyLayout->addWidget(minfoLabel);
 
 
         /**
@@ -91,7 +96,7 @@ public:
         hFooterLayout->setAlignment(Qt::AlignBottom);
 
         // add sub layouts into Main Layout
-        vMainLayout->addLayout(hHeaderLayout);
+        vMainLayout->addWidget(headerWidget);
         vMainLayout->addLayout(hBodyLayout);
         vMainLayout->addLayout(hFooterLayout);
 
