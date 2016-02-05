@@ -31,7 +31,7 @@ Q_OBJECT
 private:
     QWidget* mWindow;
     QLineEdit* mTxtSearchQuery;
-    QLabel *minfoLabel;
+    QLabel *mInfoLabel;
 
 public:
     /**
@@ -52,6 +52,7 @@ public:
          */
         //Header widget
         QWidget *headerWidget = new QWidget();
+        //Header layout
         QHBoxLayout *hHeaderLayout = new QHBoxLayout(headerWidget);
         hHeaderLayout->setAlignment(Qt::AlignTop);
         // Label
@@ -79,26 +80,37 @@ public:
         /**
          * Body Layout
          */
-        QHBoxLayout *hBodyLayout = new QHBoxLayout;
+        // body widget
+        QWidget *bodyWidget = new QWidget();
+        // body layout
+        QHBoxLayout *hBodyLayout = new QHBoxLayout(bodyWidget);
         hBodyLayout->setAlignment(Qt::AlignCenter);
 
-        // Label
-        minfoLabel = new QLabel();
-        minfoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-        minfoLabel->setText("TEST");
-        hBodyLayout->addWidget(minfoLabel);
-
+        // configure body widget
+        bodyWidget->setStyleSheet("background-color:green");
 
         /**
          * Footer Layout
          */
-        QHBoxLayout *hFooterLayout = new QHBoxLayout;
-        hFooterLayout->setAlignment(Qt::AlignBottom);
+        // footer widget
+        QWidget *footerWidget = new QWidget();
+        // footer layout
+        QHBoxLayout *hFooterLayout = new QHBoxLayout(footerWidget);
+        hFooterLayout->setAlignment(Qt::AlignCenter);
+
+        // Label
+        mInfoLabel = new QLabel();
+        mInfoLabel->setAlignment(Qt::AlignTop);
+        mInfoLabel->setText("TEST");
+        hFooterLayout->addWidget(mInfoLabel);
+
+        // configure footer widget
+        footerWidget->setStyleSheet("background-color:yellow");
 
         // add sub layouts into Main Layout
         vMainLayout->addWidget(headerWidget);
-        vMainLayout->addLayout(hBodyLayout);
-        vMainLayout->addLayout(hFooterLayout);
+        vMainLayout->addWidget(bodyWidget);
+        vMainLayout->addWidget(footerWidget);
 
         //Main Window
         mWindow = new QWidget;
@@ -140,6 +152,8 @@ public slots:
         cout << "Min temp: " << weatherInfo.temp_min << endl;
         cout << "Humidity: " << weatherInfo.humidity << endl;
         cout << "Pressure: " << weatherInfo.pressure << endl;
+
+        mInfoLabel->setText(QString("%1").arg(weatherInfo.temp));
 
         // set focus and select current text
         mTxtSearchQuery->setFocus();
