@@ -19,6 +19,7 @@
 #include "ApiCall.h"
 #include "WeatherParser.h"
 #include "WeatherData.h"
+#include "WeatherMapper.h"
 
 
 using namespace std;
@@ -160,6 +161,7 @@ public slots:
      * Request Weather Data
      */
     void requestWeatherData() {
+
         // create api uri to call
         QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->text());
         // create api caller object
@@ -187,6 +189,14 @@ public slots:
         //mImage->load("icons/clouds.png");
         loadNewImage("clouds");
         mInfoLabel->setText(QString("%1").arg(weatherInfo.temp));
+
+        //Weather mapper test
+        WeatherMapper *mapper = new WeatherMapper();
+        std::string s = mapper->getWeatherIcon("gale");
+        cout << "WEATHER1: " << s << endl;
+        // Exception if not in map!
+        // std::string s1 = mapper->getWeatherIcon("notExisting");
+        // cout << "WEATHER2: " << s1 << endl;
 
         // set focus and select current text
         mTxtSearchQuery->setFocus();
