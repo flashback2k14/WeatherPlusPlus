@@ -10,10 +10,17 @@
 #include <QNetworkRequest>
 #include <QByteArray>
 
+#include <iostream>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
+#include "WeatherUi.h"
+#include "ApiCall.h"
 #include "ApiUri.h"
 #include "ApiCall.h"
+#include "WeatherParser.h"
+#include "WeatherData.h"
 
-#include <iostream>
+
 using namespace std;
 
 
@@ -101,10 +108,27 @@ public slots:
         QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->text());
         // create api caller object
         ApiCall currentWeatherByCity(uri);
+
         // get data response
         QByteArray ba = currentWeatherByCity.sendRequest();
         // print response
         cout << "Call: " << ba.data() << endl;
+
+        WeatherParser parser(ba);
+        //get all descriptions
+        std::vector<WeatherDescription> descriptions = parser.getWeatherDescription();
+        WeatherDescription description = descriptions[0];
+        cout << "Short desc: " << description.main << endl;
+        cout << "Long desc: " << description.description << endl;
+
+        //get detailed information
+        WeatherInfo weatherInfo = parser.getWeatheInfo();
+        cout << "Temp: " << weatherInfo.temp << endl;
+        cout << "Max temp: " << weatherInfo.temp_max << endl;
+        cout << "Min temp: " << weatherInfo.temp_min << endl;
+        cout << "Humidity: " << weatherInfo.humidity << endl;
+        cout << "Pressure: " << weatherInfo.pressure << endl;
+
         // clear input
         mTxtSearchQuery->setText("");
     };
