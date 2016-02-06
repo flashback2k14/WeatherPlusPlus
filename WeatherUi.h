@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QByteArray>
+#include <QGraphicsDropShadowEffect>
 
 #include "ApiUri.h"
 #include "ApiCall.h"
@@ -68,8 +69,10 @@ public:
         mWindow = new QWidget;
         mWindow->setLayout(vMainLayout);
         mWindow->setWindowTitle("Weather++");
-        mWindow->setFixedHeight(500);
+        mWindow->setFixedHeight(600);
         mWindow->setFixedWidth(900);
+
+        mWindow->setStyleSheet("background-color:#003580;");
     };
 
     /**
@@ -89,22 +92,30 @@ protected:
 
         //Header layout
         QHBoxLayout *hHeaderLayout = new QHBoxLayout(headerWidget);
-        hHeaderLayout->setAlignment(Qt::AlignTop);
+        hHeaderLayout->setAlignment(Qt::AlignCenter);
 
         // Label
         QLabel *label = new QLabel;
         label->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
         label->setText("Choose your City:");
+        label->setFixedHeight(25);
+        label->setStyleSheet("color:#EEEEEE; margin-top:0;");
 
         // Textfield
         mTxtSearchQuery = new QLineEdit;
         mTxtSearchQuery->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
         mTxtSearchQuery->setFixedHeight(25);
+        mTxtSearchQuery->setStyleSheet("color:#EEEEEE; border:none; border-bottom:1px solid #FFFFFF; margin: 0 10px 0 10px;");
 
         // Button
         QPushButton *btnSearch = new QPushButton;
         btnSearch->setText("SEARCH");
         btnSearch->setDefault(true);
+        btnSearch->setFixedWidth(100);
+        btnSearch->setFixedHeight(25);
+        btnSearch->setCursor(Qt::PointingHandCursor);
+        btnSearch->setStyleSheet(*configureButtonStyling("sans", "rgba(242,0,63,1.0)", "#EEEEEE"));
+
         // Click Listener
         connect(btnSearch, SIGNAL(clicked()), this, SLOT(requestWeatherData()));
 
@@ -139,17 +150,23 @@ protected:
         // load the placeholder image
         mImage->load("icons/unknown.png");
         // replace the current image with the scaled one
-        *mImage = mImage->scaled(200, 200 ,Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        *mImage = mImage->scaled(235, 235, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         // add image to label
         mImageLabel->setPixmap(QPixmap::fromImage(*mImage));
         mImageLabel->setAlignment(Qt::AlignCenter);
-        mImageLabel->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
+        mImageLabel->setFixedWidth(250);
+        mImageLabel->setFixedHeight(250);
+        mImageLabel->setStyleSheet("background:lightgrey; border-radius:5px; margin:5px; padding:5px;");
+
+        QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(mImageLabel);
+        effect->setColor(QColor(0, 0, 0, 100));
+        mImageLabel->setGraphicsEffect(effect);
 
         // weather description
         mImageDesc = new QLabel();
         mImageDesc->setAlignment(Qt::AlignCenter);
-        mImageDesc->setStyleSheet("font-size:30pt;");
         mImageDesc->setText("Unknown");
+        mImageDesc->setStyleSheet("font-size:30pt; color:#EEEEEE; margin-top: 20px;");
 
         // add widgets to body layout
         vBodyLayout->addWidget(mImageLabel);
@@ -177,7 +194,7 @@ protected:
         mInfoTemp = new QLabel();
         mInfoTemp->setAlignment(Qt::AlignCenter);
         mInfoTemp->setText("unknown °C");
-        mInfoTemp->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTemp->setStyleSheet("font-size:20pt; margin:5px; color:#EEEEEE;");
         // add label to 1. footer row
         hFooterFirstRowLayout->addWidget(mInfoTemp);
 
@@ -188,12 +205,12 @@ protected:
         mInfoTempMin = new QLabel();
         mInfoTempMin->setAlignment(Qt::AlignCenter);
         mInfoTempMin->setText("MIN: unknown °C");
-        mInfoTempMin->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTempMin->setStyleSheet("font-size:20pt; margin:5px; color:#EEEEEE;");
         // Label temp max
         mInfoTempMax = new QLabel();
         mInfoTempMax->setAlignment(Qt::AlignCenter);
         mInfoTempMax->setText("MAX: unknown °C");
-        mInfoTempMax->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTempMax->setStyleSheet("font-size:20pt; margin:5px; color:#EEEEEE;");
         // add labels to 2. footer row
         hFooterSecondRowLayout->addWidget(mInfoTempMin);
         hFooterSecondRowLayout->addWidget(mInfoTempMax);
@@ -205,12 +222,12 @@ protected:
         mInfoHumidity = new QLabel();
         mInfoHumidity->setAlignment(Qt::AlignCenter);
         mInfoHumidity->setText("Humidity:\t unknown %");
-        mInfoHumidity->setStyleSheet("font-size:15pt;margin:5px");
+        mInfoHumidity->setStyleSheet("font-size:15pt; margin:5px; color:#EEEEEE;");
         // Label pressure
         mInfoPressure = new QLabel();
         mInfoPressure->setAlignment(Qt::AlignCenter);
         mInfoPressure->setText("Pressure:\t unknown hPa");
-        mInfoPressure->setStyleSheet("font-size:15pt;margin:5px");
+        mInfoPressure->setStyleSheet("font-size:15pt; margin:5px; color:#EEEEEE;");
         // add labels to 3. footer row
         hFooterThirdRowLayout->addWidget(mInfoHumidity);
         hFooterThirdRowLayout->addWidget(mInfoPressure);
@@ -233,8 +250,22 @@ protected:
         // load the new image
         img->load("icons/" + imageName + ".png");
         // replace the current image with the scaled one
-        *img = img->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        *img = img->scaled(235, 235, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         mImageLabel->setPixmap(QPixmap::fromImage(*img));
+    }
+
+    /**
+     * configure button styling
+     */
+    QString* configureButtonStyling(std::string btnFontFamily, std::string btnBg, std::string btnColor) {
+        QString *styling = new QString;
+        styling->append("font-family:" + QString::fromStdString(btnFontFamily) + ";");
+        styling->append("background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 " + QString::fromStdString(btnBg) + ", stop: 1 " + QString::fromStdString(btnBg) + ");");
+        styling->append("color:" + QString::fromStdString(btnColor) + ";");
+        styling->append("border:none;");
+        styling->append("border-radius:5px;");
+        styling->append("margin-top: 0;");
+        return styling;
     }
 
 public slots:
