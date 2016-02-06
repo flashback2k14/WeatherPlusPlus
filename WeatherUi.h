@@ -160,6 +160,7 @@ protected:
 
         QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(mImageLabel);
         effect->setColor(QColor(0, 0, 0, 100));
+        effect->setBlurRadius(15.0);
         mImageLabel->setGraphicsEffect(effect);
 
         // weather description
