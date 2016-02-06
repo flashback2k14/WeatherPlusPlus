@@ -3,7 +3,9 @@
 
 #include <string>
 
+
 struct WeatherDescription {
+    std::string icon;
     std::string main;
     std::string description;
 };
