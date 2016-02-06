@@ -16,6 +16,9 @@
 #include "WeatherMapper.h"
 
 #include <iostream>
+#include <qstackedwidget.h>
+#include <qcombobox.h>
+
 using namespace std;
 
 
@@ -29,6 +32,7 @@ private:
      */
     QString mAppPath;
     QWidget *mWindow;
+    QStackedWidget *stack;
     // header
     QLineEdit *mTxtSearchQuery;
     // body
@@ -55,20 +59,44 @@ public:
     void setupUi() {
         // build Layout
         QVBoxLayout *vMainLayout = new QVBoxLayout;
+        // build stack widget for multiple pages
+        stack = new QStackedWidget();
+
+        // First page with single weather
+        QWidget *singleWeatherPage = new QWidget();
+        QVBoxLayout *hSingleWeather = new QVBoxLayout(singleWeatherPage);
+        // Widgets of the first page
         QWidget *header = buildHeaderWidget();
         QWidget *body = buildBodyWidget();
         QWidget *footer = buildFooterWidget();
 
-        // add sub layouts into Main Layout
-        vMainLayout->addWidget(header);
-        vMainLayout->addWidget(body);
-        vMainLayout->addWidget(footer);
+        hSingleWeather->addWidget(header);
+        hSingleWeather->addWidget(body);
+        hSingleWeather->addWidget(footer);
+
+        // Second page with forecast
+        QWidget *forecastWeatherPage = new QWidget();
+        QVBoxLayout *hForecastWeather = new QVBoxLayout(forecastWeatherPage);
+        // Widgets of the second page
+        QWidget *forecastHeader = buildHeaderWidget();
+        QWidget *forecastBody = buildBodyWidget();
+        QWidget *forecastFooter = buildForecastFooterWidget();
+
+        hForecastWeather->addWidget(forecastHeader);
+        hForecastWeather->addWidget(forecastFooter);
+
+        // add first page to stack
+        stack->insertWidget(0, singleWeatherPage);
+        stack->insertWidget(1, forecastWeatherPage);
+        // add stack to the main layout
+        vMainLayout->addWidget(buildComboboxWidget());
+        vMainLayout->addWidget(stack);
 
         //Main Window
         mWindow = new QWidget;
         mWindow->setLayout(vMainLayout);
         mWindow->setWindowTitle("Weather++");
-        mWindow->setFixedHeight(500);
+        mWindow->setFixedHeight(700);
         mWindow->setFixedWidth(900);
     };
 
@@ -80,6 +108,25 @@ public:
     };
 
 protected:
+
+    QWidget *buildComboboxWidget() {
+        // Page selection widget
+        QWidget *pageSelectionWidget = new QWidget();
+        QHBoxLayout *hPageSelectionLayout = new QHBoxLayout(pageSelectionWidget);
+        hPageSelectionLayout->setAlignment(Qt::AlignCenter);
+
+        QComboBox *pages = new QComboBox();
+        pages->addItem(tr("Current weather"));
+        pages->addItem(tr("3 days forecast"));
+
+        connect(pages, SIGNAL(activated(int)),
+                this, SLOT(swapPage(int)));
+
+        hPageSelectionLayout->addWidget(pages);
+
+        return pageSelectionWidget;
+    }
+
     /**
      * Build Header Layout
      */
@@ -225,6 +272,92 @@ protected:
     }
 
     /**
+     * Build Footer Layout
+     */
+    QWidget *buildForecastFooterWidget() {
+        // footer widget
+        QWidget *forecastFooterWidget = new QWidget();
+
+        QHBoxLayout *hForecastColumnLayout = new QHBoxLayout(forecastFooterWidget);
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
+        // return widget
+        return forecastFooterWidget;
+    }
+
+    /**
+     * Build Footer Layout
+     */
+    QWidget *buildOneForecastElementWidget() {
+        // footer widget
+        QWidget *footerWidget = new QWidget();
+
+        // footer layout
+        QVBoxLayout *vFooterLayout = new QVBoxLayout(footerWidget);
+        vFooterLayout->setAlignment(Qt::AlignCenter);
+
+        // 1. footer row
+        //QHBoxLayout *hFooterFirstRowLayout = new QHBoxLayout();
+        //hFooterFirstRowLayout->setAlignment(Qt::AlignCenter);
+        // label temp
+        mInfoTemp = new QLabel();
+        mInfoTemp->setAlignment(Qt::AlignLeft);
+        mInfoTemp->setText("unknown °C");
+        mInfoTemp->setStyleSheet("font-size:20pt;margin:15px");
+        // add label to 1. footer row
+        //hFooterFirstRowLayout->addWidget(mInfoTemp);
+
+        // 2. footer row
+        //QHBoxLayout *hFooterSecondRowLayout = new QHBoxLayout();
+        //hFooterSecondRowLayout->setAlignment(Qt::AlignCenter);
+        // Label temp min
+        mInfoTempMin = new QLabel();
+        mInfoTempMin->setAlignment(Qt::AlignLeft);
+        mInfoTempMin->setText("MIN:\t unknown °C");
+        mInfoTempMin->setStyleSheet("font-size:10pt;margin:5px");
+        // Label temp max
+        mInfoTempMax = new QLabel();
+        mInfoTempMax->setAlignment(Qt::AlignLeft);
+        mInfoTempMax->setText("MAX:\t unknown °C");
+        mInfoTempMax->setStyleSheet("font-size:10pt;margin:5px");
+        // add labels to 2. footer row
+        //hFooterSecondRowLayout->addWidget(mInfoTempMin);
+        //hFooterSecondRowLayout->addWidget(mInfoTempMax);
+
+        // 3. footer row
+        //QHBoxLayout *hFooterThirdRowLayout = new QHBoxLayout();
+        //hFooterThirdRowLayout->setAlignment(Qt::AlignCenter);
+        // Label humidity
+        mInfoHumidity = new QLabel();
+        mInfoHumidity->setAlignment(Qt::AlignLeft);
+        mInfoHumidity->setText("Humidity:\t unknown %");
+        mInfoHumidity->setStyleSheet("font-size:10pt;margin:5px");
+        // Label pressure
+        mInfoPressure = new QLabel();
+        mInfoPressure->setAlignment(Qt::AlignLeft);
+        mInfoPressure->setText("Pressure:\t unknown hPa");
+        mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
+        // add labels to 3. footer row
+        //hFooterThirdRowLayout->addWidget(mInfoHumidity);
+        //hFooterThirdRowLayout->addWidget(mInfoPressure);
+
+        // add layout to footer layout
+        //vFooterLayout->addLayout(hFooterFirstRowLayout);
+        //vFooterLayout->addLayout(hFooterSecondRowLayout);
+        //vFooterLayout->addLayout(hFooterThirdRowLayout);
+        vFooterLayout->addWidget(buildBodyWidget());
+        vFooterLayout->addWidget(mInfoTemp);
+        vFooterLayout->addWidget(mInfoTempMax);
+        vFooterLayout->addWidget(mInfoTempMin);
+        vFooterLayout->addWidget(mInfoHumidity);
+        vFooterLayout->addWidget(mInfoPressure);
+
+        // return widget
+        return footerWidget;
+    }
+
+    /**
      * Load image for the current weather
      */
     void loadNewImage(QString imageName) {
@@ -287,6 +420,11 @@ public slots:
 
         // free memory
         delete mapper;
+    }
+
+    void swapPage(int pageIndex) {
+        cout << pageIndex << endl;
+        stack->setCurrentIndex(pageIndex);
     }
 };
 
