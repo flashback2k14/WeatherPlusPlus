@@ -58,6 +58,8 @@ private:
     ImageData img1;
     ImageData img2;
     ImageData img3;
+    ImageData img4;
+    ImageData img5;
     // footer
     // Current Weather
     QLabel *mInfoTempCurrent;
@@ -69,6 +71,8 @@ private:
     WeatherInformation wInfo1;
     WeatherInformation wInfo2;
     WeatherInformation wInfo3;
+    WeatherInformation wInfo4;
+    WeatherInformation wInfo5;
 
 public:
     /**
@@ -93,7 +97,7 @@ public:
         QVBoxLayout *hSingleWeather = new QVBoxLayout(singleWeatherPage);
         // Widgets of the first page
         QWidget *header = buildHeaderWidget();
-        QWidget *body = buildBodyWidget(&mImageCurrent, &mImageLabelCurrent, &mImageDescCurrent);
+        QWidget *body = buildBodyWidget(&mImageCurrent, &mImageLabelCurrent, &mImageDescCurrent, QSize(200, 200));
         QWidget *footer = buildFooterWidget();
 
         hSingleWeather->addWidget(header);
@@ -200,7 +204,7 @@ protected:
     /**
      * Build Body Layout
      */
-    QWidget *buildBodyWidget(QImage **img, QLabel **label, QLabel **desc) {
+    QWidget *buildBodyWidget(QImage **img, QLabel **label, QLabel **desc, QSize imgSize, bool labeled = true) {
         // body widget
         QWidget *bodyWidget = new QWidget();
 
@@ -216,21 +220,24 @@ protected:
         // load the placeholder image
         (*img)->load("icons/unknown.png");
         // replace the current image with the scaled one
-        **img = (*img)->scaled(200, 200 , Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        **img = (*img)->scaled(imgSize , Qt::KeepAspectRatio, Qt::SmoothTransformation);
         // add image to label
         (*label)->setPixmap(QPixmap::fromImage(**img));
         (*label)->setAlignment(Qt::AlignCenter);
         (*label)->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
 
-        // weather description
-        *desc = new QLabel();
-        (*desc)->setAlignment(Qt::AlignCenter);
-        (*desc)->setStyleSheet("font-size:30pt;");
-        (*desc)->setText("Unknown");
-
+        if(labeled == true){
+            // weather description
+            *desc = new QLabel();
+            (*desc)->setAlignment(Qt::AlignCenter);
+            (*desc)->setStyleSheet("font-size:30pt;");
+            (*desc)->setText("Unknown");
+            // add widgets to body layout
+            vBodyLayout->addWidget(*desc);
+        }
         // add widgets to body layout
         vBodyLayout->addWidget(*label);
-        vBodyLayout->addWidget(*desc);
+
 
         // return widget
         return bodyWidget;
@@ -352,6 +359,8 @@ protected:
         hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img1, wInfo1));
         hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img2, wInfo2));
         hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img3, wInfo3));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img4, wInfo4));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img5, wInfo5));
         // return widget
         return forecastFooterWidget;
     }
@@ -371,7 +380,7 @@ protected:
         wInfo.mInfoTemp = new QLabel();
         wInfo.mInfoTemp->setAlignment(Qt::AlignLeft);
         wInfo.mInfoTemp->setText("unknown °C");
-        wInfo.mInfoTemp->setStyleSheet("font-size:20pt;margin:15px");
+        wInfo.mInfoTemp->setStyleSheet("font-size:14pt;margin:15px");
 
         // 2. footer row
         //QHBoxLayout *hFooterSecondRowLayout = new QHBoxLayout();
@@ -402,7 +411,8 @@ protected:
         wInfo.mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
 
         // add layout to footer layout
-        vFooterLayout->addWidget(buildBodyWidget(&(img.mImage), &(img.mImageLabel), &(img.mImageDesc)));
+        vFooterLayout->addWidget(buildBodyWidget(&(img.mImage), &(img.mImageLabel), &(img.mImageDesc), QSize(100, 100),
+                                                 false));
         vFooterLayout->addWidget(wInfo.mInfoTemp);
         vFooterLayout->addWidget(wInfo.mInfoTempMax);
         vFooterLayout->addWidget(wInfo.mInfoTempMin);
