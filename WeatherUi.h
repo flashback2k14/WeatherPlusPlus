@@ -73,6 +73,9 @@ private:
     WeatherInformation wInfo3;
     WeatherInformation wInfo4;
     WeatherInformation wInfo5;
+    // Forecast data
+    std::vector<WeatherDescription> weatherDescriptions;
+    std::vector<WeatherInfo> weatherInfos;
 
 public:
     /**
@@ -356,11 +359,12 @@ protected:
         QWidget *forecastFooterWidget = new QWidget();
 
         QHBoxLayout *hForecastColumnLayout = new QHBoxLayout(forecastFooterWidget);
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img1, wInfo1));
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img2, wInfo2));
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img3, wInfo3));
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img4, wInfo4));
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img5, wInfo5));
+
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(&img1, wInfo1));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(&img2, wInfo2));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(&img3, wInfo3));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(&img4, wInfo4));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(&img5, wInfo5));
         // return widget
         return forecastFooterWidget;
     }
@@ -368,7 +372,7 @@ protected:
     /**
      * Build Element for Forecast
      */
-    QWidget *buildOneForecastElementWidget(ImageData img, WeatherInformation wInfo) {
+    QWidget *buildOneForecastElementWidget(ImageData *img/*QImage **img, QLabel **imgLabel, QLabel **imgDesc*/, WeatherInformation wInfo) {
         // footer widget
         QWidget *footerWidget = new QWidget();
 
@@ -411,7 +415,7 @@ protected:
         wInfo.mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
 
         // add layout to footer layout
-        vFooterLayout->addWidget(buildBodyWidget(&(img.mImage), &(img.mImageLabel), &(img.mImageDesc), QSize(100, 100),
+        vFooterLayout->addWidget(buildBodyWidget(&((*img).mImage), &((*img).mImageLabel), &((*img).mImageDesc), QSize(100, 100),
                                                  false));
         vFooterLayout->addWidget(wInfo.mInfoTemp);
         vFooterLayout->addWidget(wInfo.mInfoTempMax);
@@ -426,17 +430,14 @@ protected:
     /**
      * Load image for the current weather
      */
-    void loadNewImage(QString imageName) {
-        cout << "IN LOAD IMG: " << imageName.toStdString() << endl;
+    void loadNewImage(QString imageName, QLabel **currentImgLabel, QSize imgSize = QSize(200,200)) {
         // create new image
         QImage *imgLocal = new QImage();
         // load the new image
         imgLocal->load("icons/" + imageName + ".png");
         // replace the current image with the scaled one
-        *imgLocal = imgLocal->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        cout << "IN LOAD IMG: SCALE" << endl;
-        mImageLabelCurrent->setPixmap(QPixmap::fromImage(*imgLocal));
-        cout << "IN LOAD IMG: SET PIXMAP" << endl;
+        *imgLocal = imgLocal->scaled(imgSize ,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        (*currentImgLabel)->setPixmap(QPixmap::fromImage(*imgLocal));
     }
 
 public slots:
@@ -457,21 +458,10 @@ public slots:
         WeatherDescription weatherDescription = weatherDescriptions[0];
         //get detailed information
         WeatherInfo weatherInfo = parser.getWeatheInfo();
-
-        // Get Weather Icon
-        WeatherMapper *mapper = new WeatherMapper();
-        std::string weatherIcon;
-        weatherIcon = mapper->getWeatherIconByDesc(weatherDescription.description);
-        // fallback solution, if icon is not found with description
-        if (weatherIcon.empty()) {
-            weatherIcon = mapper->getWeatherIconByIcon(weatherDescription.icon);
-        }
-        // if fallback fails, show unknown icon
-        if (weatherIcon.empty()) {
-            weatherIcon = "unknown";
-        }
         // Set Weather Icon
-        loadNewImage(QString::fromStdString(weatherIcon));
+        loadNewImage(QString::fromStdString(
+                getWeatherIcon(weatherDescription.description, weatherDescription.icon)
+        ), &mImageLabelCurrent);
         // Set Weather Description
         mImageDescCurrent->setText(QString::fromStdString(weatherDescription.description));
 
@@ -484,13 +474,27 @@ public slots:
         // set focus and select current text
         mTxtSearchQueryCurrent->setFocus();
         mTxtSearchQueryCurrent->selectAll();
+    }
 
+    std::string getWeatherIcon(std::string name, std::string icon){
+        // Get Weather Icon
+        WeatherMapper *mapper = new WeatherMapper();
+        std::string weatherIcon;
+        weatherIcon = mapper->getWeatherIconByDesc(name);
+        // fallback solution, if icon is not found with description
+        if (weatherIcon.empty()) {
+            weatherIcon = mapper->getWeatherIconByIcon(icon);
+        }
+        // if fallback fails, show unknown icon
+        if (weatherIcon.empty()) {
+            weatherIcon = "unknown";
+        }
         // free memory
         delete mapper;
+        return weatherIcon;
     }
 
     void requestForecastWeatherData(){
-        cout << "get data for forecast" << endl;
         // create api uri to call
         QString uri = ApiUri::buildForecastWeatherUri(mTxtSearchQueryForecast->text());
         // create api caller object
@@ -500,9 +504,37 @@ public slots:
         // Parse JSON to Objects
         WeatherParser parser(ba);
         //get all descriptions
-        cout << "get forecast" << endl;
-        std::vector<WeatherDescription> weatherDescriptions = parser.getForecastDescriptions();
-        std::vector<WeatherInfo> weatherInfos = parser.getForecastInfos();
+        weatherDescriptions = parser.getForecastDescriptions();
+        weatherInfos = parser.getForecastInfos();
+
+        setAllForecastData(0);
+    }
+
+    void setForecastData(ImageData iData, WeatherInformation wInformation, WeatherDescription wDesc, WeatherInfo details){
+        std::string icon = getWeatherIcon(wDesc.description, wDesc.icon);
+        loadNewImage(QString::fromStdString(icon), &iData.mImageLabel, QSize(100,100));
+    }
+
+    void setAllForecastData(int index){
+        WeatherDescription wDesc1 = weatherDescriptions[index];
+        WeatherInfo details1 = weatherInfos[index];
+        setForecastData(img1, wInfo1, wDesc1, details1);
+
+        WeatherDescription wDesc2 = weatherDescriptions[index + 8];
+        WeatherInfo details2 = weatherInfos[index + 8];
+        setForecastData(img2, wInfo2, wDesc2, details2);
+
+        WeatherDescription wDesc3 = weatherDescriptions[index + 16];
+        WeatherInfo details3 = weatherInfos[index + 16];
+        setForecastData(img3, wInfo3, wDesc3, details3);
+
+        WeatherDescription wDesc4 = weatherDescriptions[index + 24];
+        WeatherInfo details4 = weatherInfos[index + 24];
+        setForecastData(img4, wInfo4, wDesc4, details4);
+
+        WeatherDescription wDesc5 = weatherDescriptions[index + 32];
+        WeatherInfo details5 = weatherInfos[index + 32];
+        setForecastData(img5, wInfo5, wDesc5, details5);
     }
 
     void swapPage(int pageIndex) {
