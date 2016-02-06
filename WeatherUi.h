@@ -442,7 +442,6 @@ public slots:
         QByteArray ba = currentWeatherByCity.sendRequest();
         // Parse JSON to Objects
         WeatherParser parser(ba);
-
         //get all descriptions
         std::vector<WeatherDescription> weatherDescriptions = parser.getWeatherDescription();
         WeatherDescription weatherDescription = weatherDescriptions[0];
@@ -482,13 +481,18 @@ public slots:
 
     void requestForecastWeatherData(){
         cout << "get data for forecast" << endl;
-
         // create api uri to call
-        QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQueryCurrent->text());
+        QString uri = ApiUri::buildForecastWeatherUri(mTxtSearchQueryForecast->text());
         // create api caller object
-        ApiCall currentWeatherByCity(uri);
+        ApiCall forecastWeatherByCity(uri);
         // get data response
-        QByteArray ba = currentWeatherByCity.sendRequest();
+        QByteArray ba = forecastWeatherByCity.sendRequest();
+        // Parse JSON to Objects
+        WeatherParser parser(ba);
+        //get all descriptions
+        cout << "get forecast" << endl;
+        std::vector<WeatherDescription> weatherDescriptions = parser.getForecastDescriptions();
+        std::vector<WeatherInfo> weatherInfos = parser.getForecastInfos();
     }
 
     void swapPage(int pageIndex) {
