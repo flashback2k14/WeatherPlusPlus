@@ -21,6 +21,19 @@
 
 using namespace std;
 
+struct ImageData {
+    QLabel *mImageLabel;
+    QImage *mImage;
+    QLabel *mImageDesc;
+};
+
+struct WeatherInformation {
+    QLabel *mInfoTemp;
+    QLabel *mInfoTempMin;
+    QLabel *mInfoTempMax;
+    QLabel *mInfoHumidity;
+    QLabel *mInfoPressure;
+};
 
 class WeatherUi : public QMainWindow {
 
@@ -34,23 +47,36 @@ private:
     QWidget *mWindow;
     QStackedWidget *stack;
     // header
-    QLineEdit *mTxtSearchQuery;
+    QLineEdit *mTxtSearchQueryCurrent;
+    QLineEdit *mTxtSearchQueryForecast;
     // body
-    QLabel *mImageLabel;
-    QImage *mImage;
-    QLabel *mImageDesc;
+    // Current Weather
+    QLabel *mImageLabelCurrent;
+    QImage *mImageCurrent;
+    QLabel *mImageDescCurrent;
+    // Forecast
+    ImageData img1;
+    ImageData img2;
+    ImageData img3;
     // footer
-    QLabel *mInfoTemp;
-    QLabel *mInfoTempMin;
-    QLabel *mInfoTempMax;
-    QLabel *mInfoHumidity;
-    QLabel *mInfoPressure;
+    // Current Weather
+    QLabel *mInfoTempCurrent;
+    QLabel *mInfoTempMinCurrent;
+    QLabel *mInfoTempMaxCurrent;
+    QLabel *mInfoHumidityCurrent;
+    QLabel *mInfoPressureCurrent;
+    // Forecast
+    WeatherInformation wInfo1;
+    WeatherInformation wInfo2;
+    WeatherInformation wInfo3;
 
 public:
     /**
      * Constructor / Destructor
      */
-    WeatherUi(QString path): mAppPath(path) {};
+    WeatherUi(QString path): mAppPath(path) {
+
+    };
     ~WeatherUi() {};
 
     /**
@@ -67,7 +93,7 @@ public:
         QVBoxLayout *hSingleWeather = new QVBoxLayout(singleWeatherPage);
         // Widgets of the first page
         QWidget *header = buildHeaderWidget();
-        QWidget *body = buildBodyWidget();
+        QWidget *body = buildBodyWidget(mImageCurrent, mImageLabelCurrent, mImageDescCurrent);
         QWidget *footer = buildFooterWidget();
 
         hSingleWeather->addWidget(header);
@@ -78,8 +104,7 @@ public:
         QWidget *forecastWeatherPage = new QWidget();
         QVBoxLayout *hForecastWeather = new QVBoxLayout(forecastWeatherPage);
         // Widgets of the second page
-        QWidget *forecastHeader = buildHeaderWidget();
-        QWidget *forecastBody = buildBodyWidget();
+        QWidget *forecastHeader = buildForecastHeaderWidget();
         QWidget *forecastFooter = buildForecastFooterWidget();
 
         hForecastWeather->addWidget(forecastHeader);
@@ -144,9 +169,9 @@ protected:
         label->setText("Choose your City:");
 
         // Textfield
-        mTxtSearchQuery = new QLineEdit;
-        mTxtSearchQuery->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
-        mTxtSearchQuery->setFixedHeight(25);
+        mTxtSearchQueryCurrent = new QLineEdit;
+        mTxtSearchQueryCurrent->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
+        mTxtSearchQueryCurrent->setFixedHeight(25);
 
         // Button
         QPushButton *btnSearch = new QPushButton;
@@ -157,7 +182,7 @@ protected:
 
         // add Widgets to Header Layout
         hHeaderLayout->addWidget(label);
-        hHeaderLayout->addWidget(mTxtSearchQuery);
+        hHeaderLayout->addWidget(mTxtSearchQueryCurrent);
         hHeaderLayout->addWidget(btnSearch);
 
         // configure header widget
@@ -170,7 +195,7 @@ protected:
     /**
      * Build Body Layout
      */
-    QWidget *buildBodyWidget() {
+    QWidget *buildBodyWidget(QImage *img, QLabel *label, QLabel *desc) {
         // body widget
         QWidget *bodyWidget = new QWidget();
 
@@ -180,27 +205,27 @@ protected:
 
         // weather icon
         // create label to hold image
-        mImageLabel = new QLabel();
+        label = new QLabel();
         // init global private image
-        mImage = new QImage();
+        img = new QImage();
         // load the placeholder image
-        mImage->load("icons/unknown.png");
+        img->load("icons/unknown.png");
         // replace the current image with the scaled one
-        *mImage = mImage->scaled(200, 200 ,Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        *img = img->scaled(200, 200 , Qt::KeepAspectRatio, Qt::SmoothTransformation);
         // add image to label
-        mImageLabel->setPixmap(QPixmap::fromImage(*mImage));
-        mImageLabel->setAlignment(Qt::AlignCenter);
-        mImageLabel->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
+        label->setPixmap(QPixmap::fromImage(*img));
+        label->setAlignment(Qt::AlignCenter);
+        label->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
 
         // weather description
-        mImageDesc = new QLabel();
-        mImageDesc->setAlignment(Qt::AlignCenter);
-        mImageDesc->setStyleSheet("font-size:30pt;");
-        mImageDesc->setText("Unknown");
+        desc = new QLabel();
+        desc->setAlignment(Qt::AlignCenter);
+        desc->setStyleSheet("font-size:30pt;");
+        desc->setText("Unknown");
 
         // add widgets to body layout
-        vBodyLayout->addWidget(mImageLabel);
-        vBodyLayout->addWidget(mImageDesc);
+        vBodyLayout->addWidget(label);
+        vBodyLayout->addWidget(desc);
 
         // return widget
         return bodyWidget;
@@ -221,46 +246,46 @@ protected:
         QHBoxLayout *hFooterFirstRowLayout = new QHBoxLayout();
         hFooterFirstRowLayout->setAlignment(Qt::AlignCenter);
         // label temp
-        mInfoTemp = new QLabel();
-        mInfoTemp->setAlignment(Qt::AlignCenter);
-        mInfoTemp->setText("unknown °C");
-        mInfoTemp->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTempCurrent = new QLabel();
+        mInfoTempCurrent->setAlignment(Qt::AlignCenter);
+        mInfoTempCurrent->setText("unknown °C");
+        mInfoTempCurrent->setStyleSheet("font-size:20pt;margin:5px");
         // add label to 1. footer row
-        hFooterFirstRowLayout->addWidget(mInfoTemp);
+        hFooterFirstRowLayout->addWidget(mInfoTempCurrent);
 
         // 2. footer row
         QHBoxLayout *hFooterSecondRowLayout = new QHBoxLayout();
         hFooterSecondRowLayout->setAlignment(Qt::AlignCenter);
         // Label temp min
-        mInfoTempMin = new QLabel();
-        mInfoTempMin->setAlignment(Qt::AlignCenter);
-        mInfoTempMin->setText("MIN: unknown °C");
-        mInfoTempMin->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTempMinCurrent = new QLabel();
+        mInfoTempMinCurrent->setAlignment(Qt::AlignCenter);
+        mInfoTempMinCurrent->setText("MIN: unknown °C");
+        mInfoTempMinCurrent->setStyleSheet("font-size:20pt;margin:5px");
         // Label temp max
-        mInfoTempMax = new QLabel();
-        mInfoTempMax->setAlignment(Qt::AlignCenter);
-        mInfoTempMax->setText("MAX: unknown °C");
-        mInfoTempMax->setStyleSheet("font-size:20pt;margin:5px");
+        mInfoTempMaxCurrent = new QLabel();
+        mInfoTempMaxCurrent->setAlignment(Qt::AlignCenter);
+        mInfoTempMaxCurrent->setText("MAX: unknown °C");
+        mInfoTempMaxCurrent->setStyleSheet("font-size:20pt;margin:5px");
         // add labels to 2. footer row
-        hFooterSecondRowLayout->addWidget(mInfoTempMin);
-        hFooterSecondRowLayout->addWidget(mInfoTempMax);
+        hFooterSecondRowLayout->addWidget(mInfoTempMinCurrent);
+        hFooterSecondRowLayout->addWidget(mInfoTempMaxCurrent);
 
         // 3. footer row
         QHBoxLayout *hFooterThirdRowLayout = new QHBoxLayout();
         hFooterThirdRowLayout->setAlignment(Qt::AlignCenter);
         // Label humidity
-        mInfoHumidity = new QLabel();
-        mInfoHumidity->setAlignment(Qt::AlignCenter);
-        mInfoHumidity->setText("Humidity:\t unknown %");
-        mInfoHumidity->setStyleSheet("font-size:15pt;margin:5px");
+        mInfoHumidityCurrent = new QLabel();
+        mInfoHumidityCurrent->setAlignment(Qt::AlignCenter);
+        mInfoHumidityCurrent->setText("Humidity:\t unknown %");
+        mInfoHumidityCurrent->setStyleSheet("font-size:15pt;margin:5px");
         // Label pressure
-        mInfoPressure = new QLabel();
-        mInfoPressure->setAlignment(Qt::AlignCenter);
-        mInfoPressure->setText("Pressure:\t unknown hPa");
-        mInfoPressure->setStyleSheet("font-size:15pt;margin:5px");
+        mInfoPressureCurrent = new QLabel();
+        mInfoPressureCurrent->setAlignment(Qt::AlignCenter);
+        mInfoPressureCurrent->setText("Pressure:\t unknown hPa");
+        mInfoPressureCurrent->setStyleSheet("font-size:15pt;margin:5px");
         // add labels to 3. footer row
-        hFooterThirdRowLayout->addWidget(mInfoHumidity);
-        hFooterThirdRowLayout->addWidget(mInfoPressure);
+        hFooterThirdRowLayout->addWidget(mInfoHumidityCurrent);
+        hFooterThirdRowLayout->addWidget(mInfoPressureCurrent);
 
         // add layout to footer layout
         vFooterLayout->addLayout(hFooterFirstRowLayout);
@@ -272,6 +297,46 @@ protected:
     }
 
     /**
+     * Build Header Layout
+     */
+    QWidget *buildForecastHeaderWidget() {
+        //Header widget
+        QWidget *headerWidget = new QWidget();
+
+        //Header layout
+        QHBoxLayout *hHeaderLayout = new QHBoxLayout(headerWidget);
+        hHeaderLayout->setAlignment(Qt::AlignTop);
+
+        // Label
+        QLabel *label = new QLabel;
+        label->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
+        label->setText("Choose your City:");
+
+        // Textfield
+        mTxtSearchQueryForecast = new QLineEdit;
+        mTxtSearchQueryForecast->setAlignment(Qt::AlignCenter | Qt::AlignLeft);
+        mTxtSearchQueryForecast->setFixedHeight(25);
+
+        // Button
+        QPushButton *btnSearch = new QPushButton;
+        btnSearch->setText("SEARCH");
+        btnSearch->setDefault(true);
+        // Click Listener
+        connect(btnSearch, SIGNAL(clicked()), this, SLOT(requestForecastWeatherData()));
+
+        // add Widgets to Header Layout
+        hHeaderLayout->addWidget(label);
+        hHeaderLayout->addWidget(mTxtSearchQueryForecast);
+        hHeaderLayout->addWidget(btnSearch);
+
+        // configure header widget
+        headerWidget->setFixedHeight(50);
+
+        // return widget
+        return headerWidget;
+    }
+
+    /**
      * Build Footer Layout
      */
     QWidget *buildForecastFooterWidget() {
@@ -279,9 +344,9 @@ protected:
         QWidget *forecastFooterWidget = new QWidget();
 
         QHBoxLayout *hForecastColumnLayout = new QHBoxLayout(forecastFooterWidget);
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
-        hForecastColumnLayout->addWidget(buildOneForecastElementWidget());
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img1, wInfo1));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img2, wInfo2));
+        hForecastColumnLayout->addWidget(buildOneForecastElementWidget(img3, wInfo3));
         // return widget
         return forecastFooterWidget;
     }
@@ -289,7 +354,7 @@ protected:
     /**
      * Build Footer Layout
      */
-    QWidget *buildOneForecastElementWidget() {
+    QWidget *buildOneForecastElementWidget(ImageData img, WeatherInformation wInfo) {
         // footer widget
         QWidget *footerWidget = new QWidget();
 
@@ -301,57 +366,57 @@ protected:
         //QHBoxLayout *hFooterFirstRowLayout = new QHBoxLayout();
         //hFooterFirstRowLayout->setAlignment(Qt::AlignCenter);
         // label temp
-        mInfoTemp = new QLabel();
-        mInfoTemp->setAlignment(Qt::AlignLeft);
-        mInfoTemp->setText("unknown °C");
-        mInfoTemp->setStyleSheet("font-size:20pt;margin:15px");
+        wInfo.mInfoTemp = new QLabel();
+        wInfo.mInfoTemp->setAlignment(Qt::AlignLeft);
+        wInfo.mInfoTemp->setText("unknown °C");
+        wInfo.mInfoTemp->setStyleSheet("font-size:20pt;margin:15px");
         // add label to 1. footer row
-        //hFooterFirstRowLayout->addWidget(mInfoTemp);
+        //hFooterFirstRowLayout->addWidget(mInfoTempCurrent);
 
         // 2. footer row
         //QHBoxLayout *hFooterSecondRowLayout = new QHBoxLayout();
         //hFooterSecondRowLayout->setAlignment(Qt::AlignCenter);
         // Label temp min
-        mInfoTempMin = new QLabel();
-        mInfoTempMin->setAlignment(Qt::AlignLeft);
-        mInfoTempMin->setText("MIN:\t unknown °C");
-        mInfoTempMin->setStyleSheet("font-size:10pt;margin:5px");
+        wInfo.mInfoTempMin = new QLabel();
+        wInfo.mInfoTempMin->setAlignment(Qt::AlignLeft);
+        wInfo.mInfoTempMin->setText("MIN:\t unknown °C");
+        wInfo.mInfoTempMin->setStyleSheet("font-size:10pt;margin:5px");
         // Label temp max
-        mInfoTempMax = new QLabel();
-        mInfoTempMax->setAlignment(Qt::AlignLeft);
-        mInfoTempMax->setText("MAX:\t unknown °C");
-        mInfoTempMax->setStyleSheet("font-size:10pt;margin:5px");
+        wInfo.mInfoTempMax = new QLabel();
+        wInfo.mInfoTempMax->setAlignment(Qt::AlignLeft);
+        wInfo.mInfoTempMax->setText("MAX:\t unknown °C");
+        wInfo.mInfoTempMax->setStyleSheet("font-size:10pt;margin:5px");
         // add labels to 2. footer row
-        //hFooterSecondRowLayout->addWidget(mInfoTempMin);
-        //hFooterSecondRowLayout->addWidget(mInfoTempMax);
+        //hFooterSecondRowLayout->addWidget(mInfoTempMinCurrent);
+        //hFooterSecondRowLayout->addWidget(mInfoTempMaxCurrent);
 
         // 3. footer row
         //QHBoxLayout *hFooterThirdRowLayout = new QHBoxLayout();
         //hFooterThirdRowLayout->setAlignment(Qt::AlignCenter);
         // Label humidity
-        mInfoHumidity = new QLabel();
-        mInfoHumidity->setAlignment(Qt::AlignLeft);
-        mInfoHumidity->setText("Humidity:\t unknown %");
-        mInfoHumidity->setStyleSheet("font-size:10pt;margin:5px");
+        wInfo.mInfoHumidity = new QLabel();
+        wInfo.mInfoHumidity->setAlignment(Qt::AlignLeft);
+        wInfo.mInfoHumidity->setText("Humidity:\t unknown %");
+        wInfo.mInfoHumidity->setStyleSheet("font-size:10pt;margin:5px");
         // Label pressure
-        mInfoPressure = new QLabel();
-        mInfoPressure->setAlignment(Qt::AlignLeft);
-        mInfoPressure->setText("Pressure:\t unknown hPa");
-        mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
+        wInfo.mInfoPressure = new QLabel();
+        wInfo.mInfoPressure->setAlignment(Qt::AlignLeft);
+        wInfo.mInfoPressure->setText("Pressure:\t unknown hPa");
+        wInfo.mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
         // add labels to 3. footer row
-        //hFooterThirdRowLayout->addWidget(mInfoHumidity);
-        //hFooterThirdRowLayout->addWidget(mInfoPressure);
+        //hFooterThirdRowLayout->addWidget(mInfoHumidityCurrent);
+        //hFooterThirdRowLayout->addWidget(mInfoPressureCurrent);
 
         // add layout to footer layout
         //vFooterLayout->addLayout(hFooterFirstRowLayout);
         //vFooterLayout->addLayout(hFooterSecondRowLayout);
         //vFooterLayout->addLayout(hFooterThirdRowLayout);
-        vFooterLayout->addWidget(buildBodyWidget());
-        vFooterLayout->addWidget(mInfoTemp);
-        vFooterLayout->addWidget(mInfoTempMax);
-        vFooterLayout->addWidget(mInfoTempMin);
-        vFooterLayout->addWidget(mInfoHumidity);
-        vFooterLayout->addWidget(mInfoPressure);
+        vFooterLayout->addWidget(buildBodyWidget(img.mImage, img.mImageLabel, img.mImageDesc));
+        vFooterLayout->addWidget(wInfo.mInfoTemp);
+        vFooterLayout->addWidget(wInfo.mInfoTempMax);
+        vFooterLayout->addWidget(wInfo.mInfoTempMin);
+        vFooterLayout->addWidget(wInfo.mInfoHumidity);
+        vFooterLayout->addWidget(wInfo.mInfoPressure);
 
         // return widget
         return footerWidget;
@@ -361,13 +426,16 @@ protected:
      * Load image for the current weather
      */
     void loadNewImage(QString imageName) {
+        cout << "IN LOAD IMG: " << imageName.toStdString() << endl;
         // create new image
-        QImage *img = new QImage();
+        QImage *imgLocal = new QImage();
         // load the new image
-        img->load("icons/" + imageName + ".png");
+        imgLocal->load("icons/" + imageName + ".png");
         // replace the current image with the scaled one
-        *img = img->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        mImageLabel->setPixmap(QPixmap::fromImage(*img));
+        *imgLocal = imgLocal->scaled(200,200,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        cout << "IN LOAD IMG: SCALE" << endl;
+        mImageLabelCurrent->setPixmap(QPixmap::fromImage(*imgLocal));
+        cout << "IN LOAD IMG: SET PIXMAP" << endl;
     }
 
 public slots:
@@ -375,12 +443,14 @@ public slots:
      * Request Weather Data
      */
     void requestWeatherData() {
+        cout << "REQUEST SINGLE" << endl;
         // create api uri to call
-        QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQuery->text());
+        QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQueryCurrent->text());
         // create api caller object
         ApiCall currentWeatherByCity(uri);
         // get data response
         QByteArray ba = currentWeatherByCity.sendRequest();
+        cout << "REQUEST SINGLE RESP: " << ba.data() << endl;
         // Parse JSON to Objects
         WeatherParser parser(ba);
 
@@ -402,24 +472,30 @@ public slots:
         if (weatherIcon.empty()) {
             weatherIcon = "unknown";
         }
+        cout << "REQUEST SINGLE ICON: " << weatherIcon << endl;
         // Set Weather Icon
         loadNewImage(QString::fromStdString(weatherIcon));
+        cout << "REQUEST SINGLE Load new img: " << endl;
         // Set Weather Description
-        mImageDesc->setText(QString::fromStdString(weatherDescription.description));
+        mImageDescCurrent->setText(QString::fromStdString(weatherDescription.description));
 
         // Footer Text
-        mInfoTemp->setText(QString("%1 °C").arg(weatherInfo.temp));
-        mInfoTempMin->setText(QString("MIN: %1°C").arg(weatherInfo.temp_min));
-        mInfoTempMax->setText(QString("MAX: %1 °C").arg(weatherInfo.temp_max));
-        mInfoHumidity->setText(QString("Humidity:\t %1 %").arg(weatherInfo.humidity));
-        mInfoPressure->setText(QString("Pressure:\t %1 hPa").arg(weatherInfo.pressure));
-
+        mInfoTempCurrent->setText(QString("%1 °C").arg(weatherInfo.temp));
+        mInfoTempMinCurrent->setText(QString("MIN: %1°C").arg(weatherInfo.temp_min));
+        mInfoTempMaxCurrent->setText(QString("MAX: %1 °C").arg(weatherInfo.temp_max));
+        mInfoHumidityCurrent->setText(QString("Humidity:\t %1 %").arg(weatherInfo.humidity));
+        mInfoPressureCurrent->setText(QString("Pressure:\t %1 hPa").arg(weatherInfo.pressure));
+        cout << "REQUEST SINGLE FINISHED" << endl;
         // set focus and select current text
-        mTxtSearchQuery->setFocus();
-        mTxtSearchQuery->selectAll();
+        mTxtSearchQueryCurrent->setFocus();
+        mTxtSearchQueryCurrent->selectAll();
 
         // free memory
         delete mapper;
+    }
+
+    void requestForecastWeatherData(){
+        cout << "get data for forecast" << endl;
     }
 
     void swapPage(int pageIndex) {
