@@ -482,6 +482,13 @@ public slots:
 
     void requestForecastWeatherData(){
         cout << "get data for forecast" << endl;
+
+        // create api uri to call
+        QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQueryCurrent->text());
+        // create api caller object
+        ApiCall currentWeatherByCity(uri);
+        // get data response
+        QByteArray ba = currentWeatherByCity.sendRequest();
     }
 
     void swapPage(int pageIndex) {
