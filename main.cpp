@@ -2,13 +2,14 @@
 #include "WeatherUi.h"
 using namespace std;
 
+
 int main(int argc, char *argv[]) {
 
     // Create Application
     QApplication app(argc, argv);
 
     // Create WeatherUi Window
-    WeatherUi wui;
+    WeatherUi wui(app.applicationDirPath());
 
     // Setup Window
     wui.setupUi();
