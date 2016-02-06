@@ -93,7 +93,7 @@ public:
         QVBoxLayout *hSingleWeather = new QVBoxLayout(singleWeatherPage);
         // Widgets of the first page
         QWidget *header = buildHeaderWidget();
-        QWidget *body = buildBodyWidget(mImageCurrent, mImageLabelCurrent, mImageDescCurrent);
+        QWidget *body = buildBodyWidget(&mImageCurrent, &mImageLabelCurrent, &mImageDescCurrent);
         QWidget *footer = buildFooterWidget();
 
         hSingleWeather->addWidget(header);
@@ -110,8 +110,9 @@ public:
         hForecastWeather->addWidget(forecastHeader);
         hForecastWeather->addWidget(forecastFooter);
 
-        // add first page to stack
+        // add first page to stack at index 0
         stack->insertWidget(0, singleWeatherPage);
+        // add second page to stack at index 1
         stack->insertWidget(1, forecastWeatherPage);
         // add stack to the main layout
         vMainLayout->addWidget(buildComboboxWidget());
@@ -137,13 +138,17 @@ protected:
     QWidget *buildComboboxWidget() {
         // Page selection widget
         QWidget *pageSelectionWidget = new QWidget();
+        // Horizontal Layout
         QHBoxLayout *hPageSelectionLayout = new QHBoxLayout(pageSelectionWidget);
+        // Place the combo box at the center
         hPageSelectionLayout->setAlignment(Qt::AlignCenter);
 
+        // Combobox + Entries
         QComboBox *pages = new QComboBox();
         pages->addItem(tr("Current weather"));
         pages->addItem(tr("3 days forecast"));
 
+        // Add Listener
         connect(pages, SIGNAL(activated(int)),
                 this, SLOT(swapPage(int)));
 
@@ -195,7 +200,7 @@ protected:
     /**
      * Build Body Layout
      */
-    QWidget *buildBodyWidget(QImage *img, QLabel *label, QLabel *desc) {
+    QWidget *buildBodyWidget(QImage **img, QLabel **label, QLabel **desc) {
         // body widget
         QWidget *bodyWidget = new QWidget();
 
@@ -205,27 +210,27 @@ protected:
 
         // weather icon
         // create label to hold image
-        label = new QLabel();
+        *label = new QLabel();
         // init global private image
-        img = new QImage();
+        *img = new QImage();
         // load the placeholder image
-        img->load("icons/unknown.png");
+        (*img)->load("icons/unknown.png");
         // replace the current image with the scaled one
-        *img = img->scaled(200, 200 , Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        **img = (*img)->scaled(200, 200 , Qt::KeepAspectRatio, Qt::SmoothTransformation);
         // add image to label
-        label->setPixmap(QPixmap::fromImage(*img));
-        label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
+        (*label)->setPixmap(QPixmap::fromImage(**img));
+        (*label)->setAlignment(Qt::AlignCenter);
+        (*label)->setStyleSheet("background:lightgrey;border-radius:5px;margin:5px;");
 
         // weather description
-        desc = new QLabel();
-        desc->setAlignment(Qt::AlignCenter);
-        desc->setStyleSheet("font-size:30pt;");
-        desc->setText("Unknown");
+        *desc = new QLabel();
+        (*desc)->setAlignment(Qt::AlignCenter);
+        (*desc)->setStyleSheet("font-size:30pt;");
+        (*desc)->setText("Unknown");
 
         // add widgets to body layout
-        vBodyLayout->addWidget(label);
-        vBodyLayout->addWidget(desc);
+        vBodyLayout->addWidget(*label);
+        vBodyLayout->addWidget(*desc);
 
         // return widget
         return bodyWidget;
@@ -352,7 +357,7 @@ protected:
     }
 
     /**
-     * Build Footer Layout
+     * Build Element for Forecast
      */
     QWidget *buildOneForecastElementWidget(ImageData img, WeatherInformation wInfo) {
         // footer widget
@@ -362,16 +367,11 @@ protected:
         QVBoxLayout *vFooterLayout = new QVBoxLayout(footerWidget);
         vFooterLayout->setAlignment(Qt::AlignCenter);
 
-        // 1. footer row
-        //QHBoxLayout *hFooterFirstRowLayout = new QHBoxLayout();
-        //hFooterFirstRowLayout->setAlignment(Qt::AlignCenter);
         // label temp
         wInfo.mInfoTemp = new QLabel();
         wInfo.mInfoTemp->setAlignment(Qt::AlignLeft);
         wInfo.mInfoTemp->setText("unknown °C");
         wInfo.mInfoTemp->setStyleSheet("font-size:20pt;margin:15px");
-        // add label to 1. footer row
-        //hFooterFirstRowLayout->addWidget(mInfoTempCurrent);
 
         // 2. footer row
         //QHBoxLayout *hFooterSecondRowLayout = new QHBoxLayout();
@@ -390,9 +390,6 @@ protected:
         //hFooterSecondRowLayout->addWidget(mInfoTempMinCurrent);
         //hFooterSecondRowLayout->addWidget(mInfoTempMaxCurrent);
 
-        // 3. footer row
-        //QHBoxLayout *hFooterThirdRowLayout = new QHBoxLayout();
-        //hFooterThirdRowLayout->setAlignment(Qt::AlignCenter);
         // Label humidity
         wInfo.mInfoHumidity = new QLabel();
         wInfo.mInfoHumidity->setAlignment(Qt::AlignLeft);
@@ -403,15 +400,9 @@ protected:
         wInfo.mInfoPressure->setAlignment(Qt::AlignLeft);
         wInfo.mInfoPressure->setText("Pressure:\t unknown hPa");
         wInfo.mInfoPressure->setStyleSheet("font-size:10pt;margin:5px");
-        // add labels to 3. footer row
-        //hFooterThirdRowLayout->addWidget(mInfoHumidityCurrent);
-        //hFooterThirdRowLayout->addWidget(mInfoPressureCurrent);
 
         // add layout to footer layout
-        //vFooterLayout->addLayout(hFooterFirstRowLayout);
-        //vFooterLayout->addLayout(hFooterSecondRowLayout);
-        //vFooterLayout->addLayout(hFooterThirdRowLayout);
-        vFooterLayout->addWidget(buildBodyWidget(img.mImage, img.mImageLabel, img.mImageDesc));
+        vFooterLayout->addWidget(buildBodyWidget(&(img.mImage), &(img.mImageLabel), &(img.mImageDesc)));
         vFooterLayout->addWidget(wInfo.mInfoTemp);
         vFooterLayout->addWidget(wInfo.mInfoTempMax);
         vFooterLayout->addWidget(wInfo.mInfoTempMin);
@@ -443,14 +434,12 @@ public slots:
      * Request Weather Data
      */
     void requestWeatherData() {
-        cout << "REQUEST SINGLE" << endl;
         // create api uri to call
         QString uri = ApiUri::buildCurrentWeatherUri(mTxtSearchQueryCurrent->text());
         // create api caller object
         ApiCall currentWeatherByCity(uri);
         // get data response
         QByteArray ba = currentWeatherByCity.sendRequest();
-        cout << "REQUEST SINGLE RESP: " << ba.data() << endl;
         // Parse JSON to Objects
         WeatherParser parser(ba);
 
@@ -472,10 +461,8 @@ public slots:
         if (weatherIcon.empty()) {
             weatherIcon = "unknown";
         }
-        cout << "REQUEST SINGLE ICON: " << weatherIcon << endl;
         // Set Weather Icon
         loadNewImage(QString::fromStdString(weatherIcon));
-        cout << "REQUEST SINGLE Load new img: " << endl;
         // Set Weather Description
         mImageDescCurrent->setText(QString::fromStdString(weatherDescription.description));
 
@@ -485,7 +472,6 @@ public slots:
         mInfoTempMaxCurrent->setText(QString("MAX: %1 °C").arg(weatherInfo.temp_max));
         mInfoHumidityCurrent->setText(QString("Humidity:\t %1 %").arg(weatherInfo.humidity));
         mInfoPressureCurrent->setText(QString("Pressure:\t %1 hPa").arg(weatherInfo.pressure));
-        cout << "REQUEST SINGLE FINISHED" << endl;
         // set focus and select current text
         mTxtSearchQueryCurrent->setFocus();
         mTxtSearchQueryCurrent->selectAll();
@@ -499,7 +485,6 @@ public slots:
     }
 
     void swapPage(int pageIndex) {
-        cout << pageIndex << endl;
         stack->setCurrentIndex(pageIndex);
     }
 };
