@@ -46,6 +46,7 @@ private:
     QString mAppPath;
     QWidget *mWindow;
     QStackedWidget *stack;
+    int dayTimeIndex;
     // header
     QLineEdit *mTxtSearchQueryCurrent;
     QLineEdit *mTxtSearchQueryForecast;
@@ -122,7 +123,7 @@ public:
         // add second page to stack at index 1
         stack->insertWidget(1, forecastWeatherPage);
         // add stack to the main layout
-        vMainLayout->addWidget(buildComboboxWidget());
+        vMainLayout->addWidget(buildWeatherSelectionWidget());
         vMainLayout->addWidget(stack);
 
         //Main Window
@@ -142,7 +143,7 @@ public:
 
 protected:
 
-    QWidget *buildComboboxWidget() {
+    QWidget *buildWeatherSelectionWidget() {
         // Page selection widget
         QWidget *pageSelectionWidget = new QWidget();
         // Horizontal Layout
@@ -152,8 +153,8 @@ protected:
 
         // Combobox + Entries
         QComboBox *pages = new QComboBox();
-        pages->addItem(tr("Current weather"));
-        pages->addItem(tr("3 days forecast"));
+        pages->addItem(tr("Current Weather"));
+        pages->addItem(tr("Forecast"));
 
         // Add Listener
         connect(pages, SIGNAL(activated(int)),
@@ -162,6 +163,34 @@ protected:
         hPageSelectionLayout->addWidget(pages);
 
         return pageSelectionWidget;
+    }
+
+    QWidget *buildDayTimeSelectionWidget() {
+        // Page selection widget
+        QWidget *dayTimeSelectionWidget = new QWidget();
+        // Horizontal Layout
+        QHBoxLayout *hDayTimeSelectionLayout = new QHBoxLayout(dayTimeSelectionWidget);
+        // Place the combo box at the center
+        hDayTimeSelectionLayout->setAlignment(Qt::AlignCenter);
+
+        // Combobox + Entries
+        QComboBox *dayTimes = new QComboBox();
+        dayTimes->addItem(tr("3 o'clock pm"));
+        dayTimes->addItem(tr("6 o'clock pm"));
+        dayTimes->addItem(tr("9 o'clock pm"));
+        dayTimes->addItem(tr("Midnight"));
+        dayTimes->addItem(tr("3 o'clock am"));
+        dayTimes->addItem(tr("6 o'clock am"));
+        dayTimes->addItem(tr("9 o'clock am"));
+        dayTimes->addItem(tr("Noon"));
+
+        // Add Listener
+        connect(dayTimes, SIGNAL(activated(int)),
+                this, SLOT(setAllForecastData(int)));
+
+        hDayTimeSelectionLayout->addWidget(dayTimes);
+
+        return dayTimeSelectionWidget;
     }
 
     /**
@@ -317,10 +346,12 @@ protected:
     QWidget *buildForecastHeaderWidget() {
         //Header widget
         QWidget *headerWidget = new QWidget();
+        QVBoxLayout *hHeaderLayout = new QVBoxLayout(headerWidget);
 
+        QWidget *searchBar = new QWidget();
         //Header layout
-        QHBoxLayout *hHeaderLayout = new QHBoxLayout(headerWidget);
-        hHeaderLayout->setAlignment(Qt::AlignTop);
+        QHBoxLayout *hSearchBarLayout = new QHBoxLayout(searchBar);
+        hSearchBarLayout->setAlignment(Qt::AlignTop);
 
         // Label
         QLabel *label = new QLabel;
@@ -340,12 +371,16 @@ protected:
         connect(btnSearch, SIGNAL(clicked()), this, SLOT(requestForecastWeatherData()));
 
         // add Widgets to Header Layout
-        hHeaderLayout->addWidget(label);
-        hHeaderLayout->addWidget(mTxtSearchQueryForecast);
-        hHeaderLayout->addWidget(btnSearch);
+        hSearchBarLayout->addWidget(label);
+        hSearchBarLayout->addWidget(mTxtSearchQueryForecast);
+        hSearchBarLayout->addWidget(btnSearch);
 
-        // configure header widget
-        headerWidget->setFixedHeight(50);
+        searchBar->setFixedHeight(50);
+
+        hHeaderLayout->addWidget(searchBar);
+        hHeaderLayout->addWidget(buildDayTimeSelectionWidget());
+
+
 
         // return widget
         return headerWidget;
@@ -505,10 +540,10 @@ public slots:
         weatherDescriptions = parser.getForecastDescriptions();
         weatherInfos = parser.getForecastInfos();
 
-        setAllForecastData(0);
+        setAllForecastData(dayTimeIndex);
 
-        mTxtSearchQueryCurrent->setFocus();
-        mTxtSearchQueryCurrent->selectAll();
+        mTxtSearchQueryForecast->setFocus();
+        mTxtSearchQueryForecast->selectAll();
     }
 
     void setWeatherDetails(WeatherInfo details, QLabel *temp, QLabel *max, QLabel *min, QLabel *humidity, QLabel *pressure){
@@ -531,28 +566,29 @@ public slots:
                           wInformation.mInfoPressure);
     }
 
-    void setAllForecastData(int index){
-        WeatherDescription wDesc1 = weatherDescriptions[index];
-        WeatherInfo details1 = weatherInfos[index];
-        setForecastData(img1, wInfo1, wDesc1, details1);
+    void setAllForecastData(int index = 0){
+        dayTimeIndex = index;
+        if(weatherDescriptions.size() > 0 && weatherInfos.size() > 0){
+            WeatherDescription wDesc1 = weatherDescriptions[dayTimeIndex];
+            WeatherInfo details1 = weatherInfos[index];
+            setForecastData(img1, wInfo1, wDesc1, details1);
 
-        WeatherDescription wDesc2 = weatherDescriptions[index + 8];
-        WeatherInfo details2 = weatherInfos[index + 8];
-        setForecastData(img2, wInfo2, wDesc2, details2);
+            WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
+            WeatherInfo details2 = weatherInfos[index + 8];
+            setForecastData(img2, wInfo2, wDesc2, details2);
 
-        WeatherDescription wDesc3 = weatherDescriptions[index + 16];
-        WeatherInfo details3 = weatherInfos[index + 16];
-        setForecastData(img3, wInfo3, wDesc3, details3);
+            WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
+            WeatherInfo details3 = weatherInfos[index + 16];
+            setForecastData(img3, wInfo3, wDesc3, details3);
 
-        WeatherDescription wDesc4 = weatherDescriptions[index + 24];
-        WeatherInfo details4 = weatherInfos[index + 24];
-        setForecastData(img4, wInfo4, wDesc4, details4);
+            WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
+            WeatherInfo details4 = weatherInfos[index + 24];
+            setForecastData(img4, wInfo4, wDesc4, details4);
 
-        WeatherDescription wDesc5 = weatherDescriptions[index + 32];
-        WeatherInfo details5 = weatherInfos[index + 32];
-        setForecastData(img5, wInfo5, wDesc5, details5);
-
-        cout << "data are set" << endl;
+            WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
+            WeatherInfo details5 = weatherInfos[index + 32];
+            setForecastData(img5, wInfo5, wDesc5, details5);
+        }
     }
 
     void swapPage(int pageIndex) {
