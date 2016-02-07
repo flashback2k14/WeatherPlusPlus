@@ -10,6 +10,10 @@ public:
     static QString buildCurrentWeatherUri(QString cityName) {
         return QString("http://api.openweathermap.org/data/2.5/weather?q=") + cityName + QString("&APPID=") + ::appId;
     };
+
+    static QString buildForecastWeatherUri(QString cityName) {
+        return QString("http://api.openweathermap.org/data/2.5/forecast?q=") + cityName + QString("&APPID=") + ::appId;
+    };
 };
 
 #endif
