@@ -34,8 +34,8 @@ struct WeatherInformation {
     QLabel *mInfoHumidity;
     QLabel *mInfoPressure;
 };
-
-class WeatherUi : public QMainWindow {
+//class WeatherUi : public QMainWindow {
+class CurrentWeatherPage : public QMainWindow {
 
 Q_OBJECT
 
@@ -82,10 +82,12 @@ public:
     /**
      * Constructor / Destructor
      */
-    WeatherUi(QString path): mAppPath(path) {
+    //WeatherUi(QString path): mAppPath(path) {
 
-    };
+    //};
     ~WeatherUi() {};
+    CurrentWeatherPage(QString path): mAppPath(path) {};
+    ~CurrentWeatherPage() {};
 
     /**
      * Build and Show

@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "WeatherUi.h"
+#include "StartPage.h"
 using namespace std;
 
 
@@ -8,14 +8,14 @@ int main(int argc, char *argv[]) {
     // Create Application
     QApplication app(argc, argv);
 
-    // Create WeatherUi Window
-    WeatherUi wui(app.applicationDirPath());
+    // Create Start Page Window
+    StartPage startPage(app.applicationDirPath());
 
     // Setup Window
-    wui.setupUi();
+    startPage.setupUi();
 
     // show Window
-    wui.showWindow();
+    startPage.showWindow();
 
     // Exit Programm
     return app.exec();
