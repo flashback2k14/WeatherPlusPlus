@@ -40,8 +40,8 @@ public:
         jsonRoot = destJsonDoc.object();
     }
 
-    QJsonObject getObjectForKey(QString keyName) {
-        return getGenericValueForKey(keyName, jsonRoot).toObject();
+    QJsonObject getObjectForKey(QString keyName, QJsonObject root) {
+        return getGenericValueForKey(keyName, root).toObject();
     }
 
     QJsonArray getArrayForKey(QString keyName, QJsonObject root) {
@@ -68,7 +68,7 @@ public:
 
     WeatherInfo getWeatheInfo() {
         WeatherInfo info;
-        QJsonObject parentObject = getObjectForKey(QString("main"));
+        QJsonObject parentObject = getObjectForKey(QString("main"), jsonRoot);
         info.temp = calvinToCelsius(getGenericValueForKey("temp", parentObject).toDouble());
         info.temp_max = calvinToCelsius(getGenericValueForKey("temp_max", parentObject).toDouble());
         info.temp_min = calvinToCelsius(getGenericValueForKey("temp_min", parentObject).toDouble());
@@ -102,8 +102,9 @@ public:
         QJsonArray list = getArrayForKey(QString("list"), jsonRoot);
         for(QJsonValue const &listValue : list){
             WeatherInfo info;
-            QJsonObject parentObject = listValue.toObject();
+            QJsonObject parentObject = getObjectForKey(QString("main"),listValue.toObject());//listValue.toObject();
             info.temp = calvinToCelsius(getGenericValueForKey("temp", parentObject).toDouble());
+            cout << "temp: " << info.temp << endl;
             info.temp_max = calvinToCelsius(getGenericValueForKey("temp_max", parentObject).toDouble());
             info.temp_min = calvinToCelsius(getGenericValueForKey("temp_min", parentObject).toDouble());
             info.humidity = getGenericValueForKey("humidity", parentObject).toInt();
