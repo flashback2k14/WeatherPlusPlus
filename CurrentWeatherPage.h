@@ -19,7 +19,7 @@
 using namespace std;
 
 
-class WeatherUi : public QMainWindow {
+class CurrentWeatherPage : public QMainWindow {
 
 Q_OBJECT
 
@@ -46,8 +46,8 @@ public:
     /**
      * Constructor / Destructor
      */
-    WeatherUi(QString path): mAppPath(path) {};
-    ~WeatherUi() {};
+    CurrentWeatherPage(QString path): mAppPath(path) {};
+    ~CurrentWeatherPage() {};
 
     /**
      * Build and Show
@@ -67,7 +67,7 @@ public:
         //Main Window
         mWindow = new QWidget;
         mWindow->setLayout(vMainLayout);
-        mWindow->setWindowTitle("Weather++");
+        mWindow->setWindowTitle("Weather++ - Current Weather");
         mWindow->setFixedHeight(500);
         mWindow->setFixedWidth(900);
     };
