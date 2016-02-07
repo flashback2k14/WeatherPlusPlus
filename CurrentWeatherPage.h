@@ -34,7 +34,6 @@ struct WeatherInformation {
     QLabel *mInfoHumidity;
     QLabel *mInfoPressure;
 };
-//class WeatherUi : public QMainWindow {
 class CurrentWeatherPage : public QMainWindow {
 
 Q_OBJECT
@@ -82,10 +81,6 @@ public:
     /**
      * Constructor / Destructor
      */
-    //WeatherUi(QString path): mAppPath(path) {
-
-    //};
-    ~WeatherUi() {};
     CurrentWeatherPage(QString path): mAppPath(path) {};
     ~CurrentWeatherPage() {};
 
@@ -572,23 +567,23 @@ public slots:
         dayTimeIndex = index;
         if(weatherDescriptions.size() > 0 && weatherInfos.size() > 0){
             WeatherDescription wDesc1 = weatherDescriptions[dayTimeIndex];
-            WeatherInfo details1 = weatherInfos[index];
+            WeatherInfo details1 = weatherInfos[dayTimeIndex];
             setForecastData(img1, wInfo1, wDesc1, details1);
 
             WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
-            WeatherInfo details2 = weatherInfos[index + 8];
+            WeatherInfo details2 = weatherInfos[dayTimeIndex + 8];
             setForecastData(img2, wInfo2, wDesc2, details2);
 
             WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
-            WeatherInfo details3 = weatherInfos[index + 16];
+            WeatherInfo details3 = weatherInfos[dayTimeIndex + 16];
             setForecastData(img3, wInfo3, wDesc3, details3);
 
             WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
-            WeatherInfo details4 = weatherInfos[index + 24];
+            WeatherInfo details4 = weatherInfos[dayTimeIndex + 24];
             setForecastData(img4, wInfo4, wDesc4, details4);
 
             WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
-            WeatherInfo details5 = weatherInfos[index + 32];
+            WeatherInfo details5 = weatherInfos[dayTimeIndex + 32];
             setForecastData(img5, wInfo5, wDesc5, details5);
         }
     }
