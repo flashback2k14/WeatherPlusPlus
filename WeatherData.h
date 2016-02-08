@@ -11,6 +11,7 @@ struct WeatherDescription {
 };
 
 struct WeatherInfo {
+    time_t dt;
     double temp;
     double pressure;
     int humidity;

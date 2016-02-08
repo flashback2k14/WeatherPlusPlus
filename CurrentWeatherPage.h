@@ -18,6 +18,7 @@
 #include <iostream>
 #include <qstackedwidget.h>
 #include <qcombobox.h>
+#include <sstream>
 
 using namespace std;
 
@@ -55,6 +56,9 @@ private:
     QImage *mImageCurrent;
     QLabel *mImageDescCurrent;
     // Forecast
+    QWidget *timeSelectionWidget;
+    QComboBox *dayTimes;
+
     ImageData img1;
     ImageData img2;
     ImageData img3;
@@ -81,7 +85,7 @@ public:
     /**
      * Constructor / Destructor
      */
-    CurrentWeatherPage(QString path): mAppPath(path) {};
+    CurrentWeatherPage(QString path): mAppPath(path), dayTimeIndex(0) {};
     ~CurrentWeatherPage() {};
 
     /**
@@ -171,20 +175,21 @@ protected:
         hDayTimeSelectionLayout->setAlignment(Qt::AlignCenter);
 
         // Combobox + Entries
-        QComboBox *dayTimes = new QComboBox();
-        dayTimes->addItem(tr("3 o'clock pm"));
-        dayTimes->addItem(tr("6 o'clock pm"));
-        dayTimes->addItem(tr("9 o'clock pm"));
-        dayTimes->addItem(tr("Midnight"));
-        dayTimes->addItem(tr("3 o'clock am"));
-        dayTimes->addItem(tr("6 o'clock am"));
-        dayTimes->addItem(tr("9 o'clock am"));
-        dayTimes->addItem(tr("Noon"));
+        dayTimes = new QComboBox();
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
+        dayTimes->addItem(tr("not available"));
 
         // Add Listener
         connect(dayTimes, SIGNAL(activated(int)),
                 this, SLOT(setAllForecastData(int)));
 
+        dayTimes->setFixedWidth(300);
         hDayTimeSelectionLayout->addWidget(dayTimes);
 
         return dayTimeSelectionWidget;
@@ -375,9 +380,9 @@ protected:
         searchBar->setFixedHeight(50);
 
         hHeaderLayout->addWidget(searchBar);
-        hHeaderLayout->addWidget(buildDayTimeSelectionWidget());
-
-
+        timeSelectionWidget = buildDayTimeSelectionWidget();
+        timeSelectionWidget->setDisabled(true);
+        hHeaderLayout->addWidget(timeSelectionWidget);
 
         // return widget
         return headerWidget;
@@ -541,6 +546,46 @@ public slots:
 
         mTxtSearchQueryForecast->setFocus();
         mTxtSearchQueryForecast->selectAll();
+
+        timeSelectionWidget->setDisabled(false);
+    }
+
+    void setAllItemTexts(time_t time){
+        const time_t ONE_DAY = 3 * 60 * 60;
+        time_t dayTime = time;
+        tm *gmtm = gmtime(&dayTime);
+        std::stringstream ss;
+        ss << (gmtm->tm_hour) << "-" << (gmtm->tm_min) << "-" << (gmtm->tm_sec);
+        std::string firstTimeString= ss.str();
+        //cout << "First time: " << asctime(gmtm) << endl;
+        //std::string firstTimeString = asctime(gmtm);
+        QString s = QString("%1").fromStdString(firstTimeString);
+        for(int i = 0; i < 8; ++i){
+            setItemText(i, dayTime,  s);
+            dayTime += ONE_DAY;
+            tm *gmtm = gmtime(&dayTime);
+            std::stringstream ss;
+            ss << (gmtm->tm_hour) << "-" << (gmtm->tm_min) << "-" << (gmtm->tm_sec);
+            firstTimeString = ss.str();
+            //std::string firstTimeString = asctime(gmtm);
+            s = QString("%1").fromStdString(firstTimeString);
+            cout << "DAY TIME: " << s.toStdString() << endl;
+        }
+    }
+
+    void setItemText(int index, time_t time, QString value){
+        if(containsDayTime(time)){
+            dayTimes->setItemText(index, value);
+        }
+    }
+
+    bool containsDayTime(time_t time){
+        for(WeatherInfo const &wInfo : weatherInfos){
+            if(wInfo.dt == time){
+                return true;
+            }
+        }
+        return false;
     }
 
     void setWeatherDetails(WeatherInfo details, QLabel *temp, QLabel *max, QLabel *min, QLabel *humidity, QLabel *pressure){
@@ -564,27 +609,57 @@ public slots:
     }
 
     void setAllForecastData(int index = 0){
+
         dayTimeIndex = index;
+        time_t now = time(0);
+        cout << "Current time: " << ctime(&now) << endl;
+        cout << "Current index: " << dayTimeIndex << endl;
         if(weatherDescriptions.size() > 0 && weatherInfos.size() > 0){
-            WeatherDescription wDesc1 = weatherDescriptions[dayTimeIndex];
-            WeatherInfo details1 = weatherInfos[dayTimeIndex];
-            setForecastData(img1, wInfo1, wDesc1, details1);
+            time_t initialTime = weatherInfos[0].dt;
+            if(weatherDescriptions.size() > dayTimeIndex && weatherInfos.size() > dayTimeIndex){
+                WeatherDescription wDesc1 = weatherDescriptions[dayTimeIndex];
+                WeatherInfo details1 = weatherInfos[dayTimeIndex];
+                time_t firstTime = details1.dt;
+                if(containsDayTime(firstTime)){
+                    setForecastData(img1, wInfo1, wDesc1, details1);
+                }
+            }
+            if(weatherDescriptions.size() > (dayTimeIndex+8) && weatherInfos.size() > (dayTimeIndex+8)) {
+                WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
+                WeatherInfo details2 = weatherInfos[dayTimeIndex + 8];
+                time_t secondTime = details2.dt;
+                if (containsDayTime(secondTime)) {
+                    setForecastData(img2, wInfo2, wDesc2, details2);
+                }
+            }
+            if(weatherDescriptions.size() > (dayTimeIndex+16) && weatherInfos.size() > (dayTimeIndex+16)) {
+                WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
+                WeatherInfo details3 = weatherInfos[dayTimeIndex + 16];
+                time_t thirdTime = details3.dt;
+                if (containsDayTime(thirdTime)) {
+                    setForecastData(img3, wInfo3, wDesc3, details3);
+                }
+            }
+            if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
+                WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
+                WeatherInfo details4 = weatherInfos[dayTimeIndex + 24];
+                time_t fourthTime = details4.dt;
+                if (containsDayTime(fourthTime)) {
+                    setForecastData(img4, wInfo4, wDesc4, details4);
+                }
+            }
+            if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
 
-            WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
-            WeatherInfo details2 = weatherInfos[dayTimeIndex + 8];
-            setForecastData(img2, wInfo2, wDesc2, details2);
-
-            WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
-            WeatherInfo details3 = weatherInfos[dayTimeIndex + 16];
-            setForecastData(img3, wInfo3, wDesc3, details3);
-
-            WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
-            WeatherInfo details4 = weatherInfos[dayTimeIndex + 24];
-            setForecastData(img4, wInfo4, wDesc4, details4);
-
-            WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
-            WeatherInfo details5 = weatherInfos[dayTimeIndex + 32];
-            setForecastData(img5, wInfo5, wDesc5, details5);
+                WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
+                WeatherInfo details5 = weatherInfos[dayTimeIndex + 32];
+                time_t fifthTime = details5.dt;
+                if (containsDayTime(fifthTime)) {
+                    setForecastData(img5, wInfo5, wDesc5, details5);
+                }
+            }
+            if(initialTime > 0){
+                setAllItemTexts(initialTime);
+            }
         }
     }
 
