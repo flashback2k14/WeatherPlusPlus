@@ -550,26 +550,32 @@ public slots:
         timeSelectionWidget->setDisabled(false);
     }
 
-    void setAllItemTexts(time_t time){
-        const time_t ONE_DAY = 3 * 60 * 60;
+    QString buildReadableTime(time_t time){
         time_t dayTime = time;
         tm *gmtm = gmtime(&dayTime);
         std::stringstream ss;
-        ss << (gmtm->tm_hour) << "-" << (gmtm->tm_min) << "-" << (gmtm->tm_sec);
-        std::string firstTimeString= ss.str();
-        //cout << "First time: " << asctime(gmtm) << endl;
-        //std::string firstTimeString = asctime(gmtm);
-        QString s = QString("%1").fromStdString(firstTimeString);
+        int hour = gmtm->tm_hour;
+        if(hour == 0){
+            ss << "Midnight";
+        }else if(hour < 12){
+            ss << hour << " o'clock am";
+        }else if(hour > 12){
+            ss << hour << " o'clock pm";
+        }else {
+            ss << "Noon";
+        }
+        std::string timeString= ss.str();
+        return QString("%1").fromStdString(timeString);
+    }
+
+    void setAllItemTexts(time_t time){
+        const time_t ONE_DAY = 3 * 60 * 60;
+        time_t dayTime = time;
+        QString s = buildReadableTime(dayTime);
         for(int i = 0; i < 8; ++i){
             setItemText(i, dayTime,  s);
             dayTime += ONE_DAY;
-            tm *gmtm = gmtime(&dayTime);
-            std::stringstream ss;
-            ss << (gmtm->tm_hour) << "-" << (gmtm->tm_min) << "-" << (gmtm->tm_sec);
-            firstTimeString = ss.str();
-            //std::string firstTimeString = asctime(gmtm);
-            s = QString("%1").fromStdString(firstTimeString);
-            cout << "DAY TIME: " << s.toStdString() << endl;
+            s = buildReadableTime(dayTime);
         }
     }
 
@@ -664,7 +670,7 @@ public slots:
             }else{
                 setDummiForecastData(img1, wInfo1);
             }
-            if(weatherDescriptions.size() > (dayTimeIndex+8) && weatherInfos.size() > (dayTimeIndex+8)) {
+            if(weatherDescriptions.size() > (dayTimeIndex + 8) && weatherInfos.size() > (dayTimeIndex+8)) {
                 WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
                 WeatherInfo details2 = weatherInfos[dayTimeIndex + 8];
                 time_t secondTime = details2.dt;
@@ -674,7 +680,7 @@ public slots:
             }else{
                 setDummiForecastData(img2, wInfo2);
             }
-            if(weatherDescriptions.size() > (dayTimeIndex+16) && weatherInfos.size() > (dayTimeIndex+16)) {
+            if(weatherDescriptions.size() > (dayTimeIndex + 16) && weatherInfos.size() > (dayTimeIndex+16)) {
                 WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
                 WeatherInfo details3 = weatherInfos[dayTimeIndex + 16];
                 time_t thirdTime = details3.dt;
@@ -684,7 +690,7 @@ public slots:
             }else{
                 setDummiForecastData(img3, wInfo3);
             }
-            if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
+            if(weatherDescriptions.size() > (dayTimeIndex + 32) && weatherInfos.size() > (dayTimeIndex+32)) {
                 WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
                 WeatherInfo details4 = weatherInfos[dayTimeIndex + 24];
                 time_t fourthTime = details4.dt;
@@ -694,7 +700,7 @@ public slots:
             }else{
                 setDummiForecastData(img4, wInfo4);
             }
-            if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
+            if(weatherDescriptions.size() > (dayTimeIndex + 32) && weatherInfos.size() > (dayTimeIndex+32)) {
                 WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
                 WeatherInfo details5 = weatherInfos[dayTimeIndex + 32];
                 time_t fifthTime = details5.dt;
