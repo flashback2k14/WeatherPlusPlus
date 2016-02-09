@@ -588,12 +588,28 @@ public slots:
         return false;
     }
 
+    QString handleIntFieldValue(int value){
+        if(value >= 99999){
+            return QString("n.A.");
+        } else {
+            return QString("%1").arg(value);
+        }
+    }
+
+    QString handleDoubleFieldValue(double value){
+        if(value >= 99999.0){
+            return QString("n.A.");
+        } else {
+            return QString("%1").arg(value);
+        }
+    }
+
     void setWeatherDetails(WeatherInfo details, QLabel *temp, QLabel *max, QLabel *min, QLabel *humidity, QLabel *pressure){
-        temp->setText(QString("%1 °C").arg(details.temp));
-        max->setText(QString("MIN: %1°C").arg(details.temp_min));
-        min->setText(QString("MAX: %1 °C").arg(details.temp_max));
-        humidity->setText(QString("Humidity: %1 %").arg(details.humidity));
-        pressure->setText(QString("Pressure: %1 hPa").arg(details.pressure));
+        temp->setText(QString("%1 °C").arg(handleDoubleFieldValue(details.temp)));
+        max->setText(QString("MIN: %1°C").arg(handleDoubleFieldValue(details.temp_min)));
+        min->setText(QString("MAX: %1 °C").arg(handleDoubleFieldValue(details.temp_max)));
+        humidity->setText(QString("Humidity: %1 %").arg(handleIntFieldValue(details.humidity)));
+        pressure->setText(QString("Pressure: %1 hPa").arg(handleDoubleFieldValue(details.pressure)));
     }
 
     void setForecastData(ImageData iData, WeatherInformation wInformation, WeatherDescription wDesc, WeatherInfo details){
