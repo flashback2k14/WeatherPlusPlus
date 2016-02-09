@@ -608,6 +608,28 @@ public slots:
                           wInformation.mInfoPressure);
     }
 
+    void setDummiForecastData(ImageData iData, WeatherInformation wInformation){
+        cout << "SET DUMMY DATA: " << endl;
+        WeatherDescription wDesc;
+        WeatherInfo details;
+
+        time_t time = details.dt;
+        //if(containsDayTime(time)){
+            std::string icon = getWeatherIcon(wDesc.description, wDesc.icon);
+            cout << "SET ICON: " << icon << endl;
+            loadNewImage(QString::fromStdString(icon), &(iData).mImageLabel, QSize(100,100));
+
+            setWeatherDetails(details,
+                              wInformation.mInfoTemp,
+                              wInformation.mInfoTempMax,
+                              wInformation.mInfoTempMin,
+                              wInformation.mInfoHumidity,
+                              wInformation.mInfoPressure);
+       // }
+
+
+    }
+
     void setAllForecastData(int index = 0){
 
         dayTimeIndex = index;
@@ -623,6 +645,8 @@ public slots:
                 if(containsDayTime(firstTime)){
                     setForecastData(img1, wInfo1, wDesc1, details1);
                 }
+            }else{
+                setDummiForecastData(img1, wInfo1);
             }
             if(weatherDescriptions.size() > (dayTimeIndex+8) && weatherInfos.size() > (dayTimeIndex+8)) {
                 WeatherDescription wDesc2 = weatherDescriptions[dayTimeIndex + 8];
@@ -631,6 +655,8 @@ public slots:
                 if (containsDayTime(secondTime)) {
                     setForecastData(img2, wInfo2, wDesc2, details2);
                 }
+            }else{
+                setDummiForecastData(img2, wInfo2);
             }
             if(weatherDescriptions.size() > (dayTimeIndex+16) && weatherInfos.size() > (dayTimeIndex+16)) {
                 WeatherDescription wDesc3 = weatherDescriptions[dayTimeIndex + 16];
@@ -639,6 +665,8 @@ public slots:
                 if (containsDayTime(thirdTime)) {
                     setForecastData(img3, wInfo3, wDesc3, details3);
                 }
+            }else{
+                setDummiForecastData(img3, wInfo3);
             }
             if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
                 WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
@@ -647,15 +675,18 @@ public slots:
                 if (containsDayTime(fourthTime)) {
                     setForecastData(img4, wInfo4, wDesc4, details4);
                 }
+            }else{
+                setDummiForecastData(img4, wInfo4);
             }
             if(weatherDescriptions.size() > (dayTimeIndex+32) && weatherInfos.size() > (dayTimeIndex+32)) {
-
                 WeatherDescription wDesc5 = weatherDescriptions[dayTimeIndex + 32];
                 WeatherInfo details5 = weatherInfos[dayTimeIndex + 32];
                 time_t fifthTime = details5.dt;
                 if (containsDayTime(fifthTime)) {
                     setForecastData(img5, wInfo5, wDesc5, details5);
                 }
+            }else{
+                setDummiForecastData(img5, wInfo5);
             }
             if(initialTime > 0){
                 setAllItemTexts(initialTime);
