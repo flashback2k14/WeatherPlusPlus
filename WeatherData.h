@@ -1,8 +1,24 @@
 #ifndef WEATHERDATA_H
 #define WEATHERDATA_H
 
+#include <QLabel>
+#include <QImage>
 #include <string>
 
+
+struct ImageData {
+    QLabel *mImageLabel;
+    QImage *mImage;
+    QLabel *mImageDesc;
+};
+
+struct WeatherInformation {
+    QLabel *mInfoTemp;
+    QLabel *mInfoTempMin;
+    QLabel *mInfoTempMax;
+    QLabel *mInfoHumidity;
+    QLabel *mInfoPressure;
+};
 
 struct WeatherDescription {
     std::string icon = "unknown";

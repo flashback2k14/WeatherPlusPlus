@@ -79,14 +79,15 @@ public:
     std::vector<WeatherDescription> getForecastDescriptions() {
         std::vector<WeatherDescription> descriptions;
         QJsonArray list = getArrayForKey(QString("list"), jsonRoot);
-        for(QJsonValue const &listValue : list){
+        for (QJsonValue const &listValue : list) {
             QJsonArray weathers = getArrayForKey(QString("weather"), listValue.toObject());
-            for(QJsonValue const &weather : weathers){
+            for (QJsonValue const &weather : weathers) {
                 WeatherDescription description;
                 QJsonObject parentObject = weather.toObject();
                 description.icon = valueToStdString(getGenericValueForKey("icon", parentObject));
                 description.main = valueToStdString(getGenericValueForKey("main", parentObject));
                 description.description = valueToStdString(getGenericValueForKey("description", parentObject));
+
                 descriptions.push_back(description);
             }
         }
@@ -97,26 +98,27 @@ public:
         int counter = 1;
         std::vector<WeatherInfo> infos;
         QJsonArray list = getArrayForKey(QString("list"), jsonRoot);
-        for(QJsonValue const &listValue : list){
-            cout << "Nr: " << counter << endl;
+
+        for (QJsonValue const &listValue : list) {
             WeatherInfo info;
-           // std::string s = (getGenericValueForKey(QString("dt"), listValue.toObject())).toString().toStdString();
             QJsonValue jv = getGenericValueForKey(QString("dt"), listValue.toObject());
             QString qs = QString("%1").arg(jv.toInt());
+
             std::string s = qs.toStdString();
-            cout << s << endl;
-            cout << "datestring: " << s << endl;
-            std::time_t tt = static_cast<time_t>(jv.toInt());
+            time_t tt = static_cast<time_t>(jv.toInt());
             info.dt = tt;
+
             tm *gmtm = gmtime(&tt);
-            cout << "New try: " << asctime(gmtm) << endl;
-            QJsonObject parentObject = getObjectForKey(QString("main"),listValue.toObject());//listValue.toObject();
+
+            QJsonObject parentObject = getObjectForKey(QString("main"),listValue.toObject());
             info.temp = calvinToCelsius(getGenericValueForKey("temp", parentObject).toDouble());
             info.temp_max = calvinToCelsius(getGenericValueForKey("temp_max", parentObject).toDouble());
             info.temp_min = calvinToCelsius(getGenericValueForKey("temp_min", parentObject).toDouble());
             info.humidity = getGenericValueForKey("humidity", parentObject).toInt();
             info.pressure = getGenericValueForKey("pressure", parentObject).toDouble();
+
             infos.push_back(info);
+
             counter++;
         }
         cout << "Size: " << infos.size() << endl;

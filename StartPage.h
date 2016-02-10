@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include "CurrentWeatherPage.h"
+#include "WeatherPages.h"
 
 
 class StartPage : public QMainWindow {
@@ -17,7 +17,7 @@ Q_OBJECT
 private:
     QString mAppPath;
     QWidget *mStartWindow;
-    CurrentWeatherPage *mCurrentWeatherWindow;
+    WeatherPages *mCurrentWeatherWindow;
 
 public:
     /**
@@ -49,7 +49,7 @@ public:
         // create button to open current weather window
         QPushButton *btnOpenCurrentWeatherWindow = new QPushButton;
         btnOpenCurrentWeatherWindow->setFixedHeight(50);
-        btnOpenCurrentWeatherWindow->setText("OPEN CURRENT WEATHER");
+        btnOpenCurrentWeatherWindow->setText("OPEN");
         btnOpenCurrentWeatherWindow->setCursor(Qt::PointingHandCursor);
         btnOpenCurrentWeatherWindow->setStyleSheet(*configureButtonStyling("sans", "rgba(242,0,63,1.0)", "#FFFFFF"));
 
@@ -124,7 +124,7 @@ public slots:
      * open current weather window
      */
     void openCurrentWeatherWindow() {
-        mCurrentWeatherWindow = new CurrentWeatherPage(mAppPath);
+        mCurrentWeatherWindow = new WeatherPages(mAppPath);
         mCurrentWeatherWindow->setupUi();
         mCurrentWeatherWindow->showWindow();
     };

@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # source code
 file(COPY icons/ DESTINATION icons)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(SOURCE_FILES main.cpp ApiCall.h ApiUri.h WeatherParser.h WeatherData.h WeatherMapper.h StartPage.h CurrentWeatherPage.h)
+set(SOURCE_FILES main.cpp ApiCall.h ApiUri.h WeatherParser.h WeatherData.h WeatherMapper.h StartPage.h WeatherPages.h)
 add_executable(WeatherPlusPlus ${SOURCE_FILES})
 # qt5
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network)
