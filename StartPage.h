@@ -129,7 +129,7 @@ public slots:
      * open current weather window
      */
     void openCurrentWeatherWindow() {
-        mCurrentWeatherWindow = new WeatherPages(mAppPath);
+        mCurrentWeatherWindow = new WeatherPages(mAppPath, mSplash);
         mCurrentWeatherWindow->setupUi();
         mCurrentWeatherWindow->showWindow();
     };

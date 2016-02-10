@@ -35,6 +35,7 @@ private:
     QWidget *mWindow;
     QStackedWidget *stack;
     int dayTimeIndex;
+    QSplashScreen *mSplash;
     // header
     QLineEdit *mTxtSearchQueryCurrent;
     QLineEdit *mTxtSearchQueryForecast;
@@ -72,7 +73,9 @@ public:
     /**
      * Constructor / Destructor
      */
-    WeatherPages(QString path): mAppPath(path), dayTimeIndex(0) {};
+    WeatherPages(QString path, QSplashScreen *splash): mAppPath(path), dayTimeIndex(0) {
+        this->mSplash = splash;
+    };
     ~WeatherPages() {};
 
     /**
@@ -128,6 +131,7 @@ public:
      * show window
      */
     void showWindow() {
+        mSplash->finish(mWindow);
         mWindow->show();
     };
 
