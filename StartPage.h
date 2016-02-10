@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <qsplashscreen.h>
 #include "WeatherPages.h"
 
 
@@ -18,12 +19,15 @@ private:
     QString mAppPath;
     QWidget *mStartWindow;
     WeatherPages *mCurrentWeatherWindow;
+    QSplashScreen *mSplash;
 
 public:
     /**
      * Constructor
      */
-    StartPage(QString appPath) : mAppPath(appPath) { }
+    StartPage(QString appPath, QSplashScreen *splash) : mAppPath(appPath){
+        this->mSplash = splash;
+    }
 
     /**
      * setup start page
@@ -74,6 +78,7 @@ public:
      * show start page
      */
     void showWindow() {
+        mSplash->finish(mStartWindow);
         mStartWindow->show();
     }
 
