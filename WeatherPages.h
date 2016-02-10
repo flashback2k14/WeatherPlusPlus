@@ -779,7 +779,7 @@ public slots:
             } else {
                 setDummyForecastData(img3, wInfo3);
             }
-            if (weatherDescriptions.size() > (dayTimeIndex + 32) && weatherInfos.size() > (dayTimeIndex+32)) {
+            if (weatherDescriptions.size() > (dayTimeIndex + 24) && weatherInfos.size() > (dayTimeIndex + 24)) {
                 WeatherDescription wDesc4 = weatherDescriptions[dayTimeIndex + 24];
                 WeatherInfo details4 = weatherInfos[dayTimeIndex + 24];
                 time_t fourthTime = details4.dt;
@@ -802,6 +802,12 @@ public slots:
             if (initialTime > 0) {
                 setAllItemTexts(initialTime);
             }
+        }else{
+            setDummyForecastData(img1, wInfo1);
+            setDummyForecastData(img2, wInfo2);
+            setDummyForecastData(img3, wInfo3);
+            setDummyForecastData(img4, wInfo4);
+            setDummyForecastData(img5, wInfo5);
         }
     }
 
