@@ -5,17 +5,18 @@
 
 
 struct WeatherDescription {
-    std::string icon;
-    std::string main;
-    std::string description;
+    std::string icon = "unknown";
+    std::string main = "unknown";
+    std::string description = "unknown";
 };
 
 struct WeatherInfo {
-    double temp;
-    double pressure;
-    int humidity;
-    double temp_min;
-    double temp_max;
+    time_t dt = 0;
+    double temp = 99999.0;
+    double pressure = 99999.0;
+    int humidity = 99999;
+    double temp_min = 99999.0;
+    double temp_max = 99999.0;
 };
 
 #endif
