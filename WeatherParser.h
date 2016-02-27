@@ -15,6 +15,7 @@ using namespace std;
 
 const static double gCALVIN = 273.15;
 
+
 class WeatherParser {
 
 private:

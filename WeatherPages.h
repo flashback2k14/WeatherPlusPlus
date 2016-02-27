@@ -11,6 +11,8 @@
 #include <QStackedWidget>
 #include <QComboBox>
 #include <QGraphicsDropShadowEffect>
+#include <QSplashScreen>
+#include <QDesktopWidget>
 
 #include "ApiUri.h"
 #include "ApiCall.h"
@@ -34,8 +36,8 @@ private:
     QString mAppPath;
     QWidget *mWindow;
     QStackedWidget *stack;
-    int dayTimeIndex;
     QSplashScreen *mSplash;
+    int dayTimeIndex;
     // header
     QLineEdit *mTxtSearchQueryCurrent;
     QLineEdit *mTxtSearchQueryForecast;
@@ -75,8 +77,8 @@ public:
      */
     WeatherPages(QString path, QSplashScreen *splash): mAppPath(path), dayTimeIndex(0) {
         this->mSplash = splash;
-    };
-    ~WeatherPages() {};
+    }
+    ~WeatherPages() {}
 
     /**
      * Build and Show
@@ -84,17 +86,20 @@ public:
     void setupUi() {
         // build Layout
         QVBoxLayout *vMainLayout = new QVBoxLayout;
+
         // build stack widget for multiple pages
         stack = new QStackedWidget();
 
         // First page with single weather
         QWidget *singleWeatherPage = new QWidget();
         QVBoxLayout *hSingleWeather = new QVBoxLayout(singleWeatherPage);
+
         // Widgets of the first page
         QWidget *header = buildHeaderWidget();
         QWidget *body = buildBodyWidget(&mImageCurrent, &mImageLabelCurrent, &mImageDescCurrent, QSize(200, 200));
         QWidget *footer = buildFooterWidget();
 
+        // Add Widgets to Layout
         hSingleWeather->addWidget(header);
         hSingleWeather->addWidget(body);
         hSingleWeather->addWidget(footer);
@@ -102,17 +107,19 @@ public:
         // Second page with forecast
         QWidget *forecastWeatherPage = new QWidget();
         QVBoxLayout *hForecastWeather = new QVBoxLayout(forecastWeatherPage);
+
         // Widgets of the second page
         QWidget *forecastHeader = buildForecastHeaderWidget();
         QWidget *forecastFooter = buildForecastFooterWidget();
 
+        // Set Widgets to Layout
         hForecastWeather->addWidget(forecastHeader);
         hForecastWeather->addWidget(forecastFooter);
 
-        // add first page to stack at index 0
+        // Add Pages to Stack
         stack->insertWidget(0, singleWeatherPage);
-        // add second page to stack at index 1
         stack->insertWidget(1, forecastWeatherPage);
+
         // add stack to the main layout
         vMainLayout->addWidget(buildWeatherSelectionWidget());
         vMainLayout->addWidget(stack);
@@ -122,18 +129,32 @@ public:
         mWindow->setLayout(vMainLayout);
         mWindow->setWindowTitle("Weather++");
         mWindow->setFixedHeight(700);
-        mWindow->setFixedWidth(900);
-
+        mWindow->setFixedWidth(1000);
         mWindow->setStyleSheet("background-color:#003580;");
-    };
+    }
 
     /**
      * show window
      */
     void showWindow() {
+        // Close Splashscreen
         mSplash->finish(mWindow);
+
+        // Get Weather Pages Window Dimensions
+        int width = mWindow->frameGeometry().width();
+        int height = mWindow->frameGeometry().height();
+
+        // Get Window Dimensions
+        QDesktopWidget wid;
+        int screenWidth = wid.screen()->width();
+        int screenHeight = wid.screen()->height();
+
+        // Center Weather Pages
+        mWindow->setGeometry((screenWidth/2)-(width/2), (screenHeight/2)-(height/2),width,height);
+
+        // Show Weather Pages
         mWindow->show();
-    };
+    }
 
 protected:
     /**
@@ -399,6 +420,7 @@ protected:
         pages->addItem(tr("Forecast"));
 
         // stlying
+        pages->setFixedWidth(200);
         pages->setStyleSheet("color: #FFFFFF;");
 
         // Add Listener
@@ -431,7 +453,7 @@ protected:
         dayTimes->addItem(tr("not available"));
 
         // styling
-        dayTimes->setFixedWidth(300);
+        dayTimes->setFixedWidth(200);
         dayTimes->setStyleSheet("color: #FFFFFF;");
 
         // Add Listener
@@ -519,7 +541,7 @@ protected:
         (*wInfo).mInfoPressure = new QLabel();
         (*wInfo).mInfoPressure->setAlignment(Qt::AlignCenter);
         (*wInfo).mInfoPressure->setText("Pressure:\t unknown hPa");
-        (*wInfo).mInfoPressure->setStyleSheet("font-size:1 0pt; margin: 5px; color:#EEEEEE;");
+        (*wInfo).mInfoPressure->setStyleSheet("font-size: 10pt; margin: 5px; color:#EEEEEE;");
 
         // add layout to footer layout
         vFooterLayout->addWidget(buildBodyWidget(&((*img).mImage), &((*img).mImageLabel), &((*img).mImageDesc), QSize(100, 100), false));
@@ -534,7 +556,7 @@ protected:
     }
 
     /**
-     *
+     * Get Weather Icon from Weather Mapper
      */
     std::string getWeatherIcon(std::string name, std::string icon) {
         // Get Weather Icon
@@ -554,14 +576,12 @@ protected:
         return weatherIcon;
     }
 
-
     /**
-     *
+     * Generate Item texts for Forecast Combobox
      */
     void setAllItemTexts(time_t time) {
         const time_t ONE_DAY = 3 * 60 * 60;
         time_t dayTime = time;
-
         QString s = buildReadableTime(dayTime);
 
         for (int i = 0; i < 8; ++i) {
@@ -572,8 +592,8 @@ protected:
     }
 
     /**
-    *
-    */
+     * Create readable Time from GMTM
+     */
     QString buildReadableTime(time_t time) {
         time_t dayTime = time;
         tm *gmtm = gmtime(&dayTime);
@@ -595,7 +615,7 @@ protected:
     }
 
     /**
-     *
+     * Set Item texts for Forecast Combobox
      */
     void setItemText(int index, time_t time, QString value) {
         if (containsDayTime(time)) {
@@ -604,7 +624,7 @@ protected:
     }
 
     /**
-     *
+     * Check if WeatherInfo contains time Attribute
      */
     bool containsDayTime(time_t time) {
         for (WeatherInfo const &wInfo : weatherInfos) {
@@ -616,7 +636,7 @@ protected:
     }
 
     /**
-     *
+     * Handle Integer Data Value
      */
     QString handleIntFieldValue(int value) {
         if (value >= 99999) {
@@ -627,7 +647,7 @@ protected:
     }
 
     /**
-     *
+     * Handle Double Data Value
      */
     QString handleDoubleFieldValue(double value) {
         if (value >= 99999.0) {
@@ -638,7 +658,7 @@ protected:
     }
 
     /**
-     *
+     * Set Weather Data to UI
      */
     void setWeatherDetails(WeatherInfo details, QLabel *temp, QLabel *max, QLabel *min, QLabel *humidity, QLabel *pressure) {
         temp->setText(QString("%1 °C").arg(handleDoubleFieldValue(details.temp)));
@@ -649,7 +669,7 @@ protected:
     }
 
     /**
-     *
+     * Set Forecast Weather Data
      */
     void setForecastData(ImageData iData, WeatherInformation wInformation, WeatherDescription wDesc, WeatherInfo details) {
         std::string icon = getWeatherIcon(wDesc.description, wDesc.icon);
@@ -664,7 +684,7 @@ protected:
     }
 
     /**
-     *
+     * Generate Dummy Forecast Data
      */
     void setDummyForecastData(ImageData iData, WeatherInformation wInformation) {
         WeatherDescription wDesc;
@@ -685,7 +705,7 @@ protected:
 
 public slots:
     /**
-     * Request Weather Data
+     * Request Current Weather Data
      */
     void requestWeatherData() {
         // create api uri to call
@@ -720,7 +740,7 @@ public slots:
     }
 
     /**
-     *
+     * Request Forecast Weather Data
      */
     void requestForecastWeatherData() {
         // create api uri to call
@@ -744,7 +764,7 @@ public slots:
     }
 
     /**
-     * ToDo
+     * Set Forecast Weather Data
      */
     void setAllForecastData(int index = 0) {
 
