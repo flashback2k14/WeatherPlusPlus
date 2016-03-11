@@ -23,8 +23,8 @@ public:
     /**
      * Constructor / Destructor
      */
-    ApiCall(QString uri) : mUri(uri) {};
-    ~ApiCall(){};
+    ApiCall(QString uri) : mUri(uri) {}
+    ~ApiCall(){}
 
     /**
      * Send Request
@@ -48,7 +48,7 @@ public:
             // error
             return reply->errorString().toUtf8();
         }
-    };
+    }
 
 };
 
